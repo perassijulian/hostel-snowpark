@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,10 +16,10 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <ul className="hidden md:flex space-x-6 text-gray-600 font-medium">
-          <li className="hover:text-black cursor-pointer">Home</li>
-          <li className="hover:text-black cursor-pointer">About</li>
-          <li className="hover:text-black cursor-pointer">Volunteer</li>
-          <li className="hover:text-black cursor-pointer">Contact</li>
+          <Link href="/" className="hover:text-black cursor-pointer">Home</Link>
+          <Link href="volunteer" className="hover:text-black cursor-pointer">Volunteer</Link>
+          <Link href="booking" className="hover:text-black cursor-pointer">Booking</Link>
+          <Link href="contact" className="hover:text-black cursor-pointer">Contact</Link>
         </ul>
 
         {/* Mobile Menu Button */}
@@ -30,10 +31,10 @@ export default function Navbar() {
       {/* Mobile Links */}
       {isOpen && (
         <ul className="md:hidden mt-4 space-y-2 text-gray-600 font-medium text-center">
-          <li className="hover:text-black cursor-pointer">Home</li>
-          <li className="hover:text-black cursor-pointer">About</li>
-          <li className="hover:text-black cursor-pointer">Volunteer</li>
-          <li className="hover:text-black cursor-pointer">Contact</li>
+          <Link href="/" className="hover:text-black cursor-pointer">Home</Link>
+          <Link href="volunteer" className="hover:text-black cursor-pointer">Volunteer</Link>
+          <Link href="booking" className="hover:text-black cursor-pointer">Booking</Link>
+          <Link href="contact" className="hover:text-black cursor-pointer">Contact</Link>
         </ul>
       )}
     </nav>
