@@ -1,8 +1,18 @@
-import Image from "next/image";
+import Navbar from "@/components/Navbar";
+import Button from "@/components/Button";
+import Card from "@/components/Card";
 
 export default function Home() {
+  const cardData = [
+    { emoji: "🏔️", title: "Snowpark", description: "rails, jumps & a homemade rope tow" },
+    { emoji: "🛏️", title: "Hostel", description: "cozy rooms for snowboarders & travelers" },
+    { emoji: "🧑‍🤝‍🧑", title: "Volunteering", description: "work, ride, and be part of the crew" },
+    { emoji: "💻", title: "Remote Friendly", description: "fast internet & chill work spaces" },
+  ];
+
   return (
     <main className="min-h-screen bg-white text-gray-800">
+      <Navbar />
       {/* Hero */}
       <section className="relative h-screen bg-cover bg-center" style={{ backgroundImage: "url('/images/hero.jpg')" }}>
         <div className="absolute inset-0 bg-black/60 flex flex-col justify-center items-center text-white text-center px-4">
@@ -26,17 +36,13 @@ export default function Home() {
       {/* Highlights */}
       <section className="bg-gray-100 py-16 px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-          {[
-            { emoji: "🏔️", title: "Snowpark", desc: "Rails, jumps & a homemade rope tow" },
-            { emoji: "🛏️", title: "Hostel", desc: "Cozy rooms for snowboarders & travelers" },
-            { emoji: "🧑‍🤝‍🧑", title: "Volunteering", desc: "Work, ride, and be part of the crew" },
-            { emoji: "💻", title: "Remote Friendly", desc: "Fast internet & chill work spaces" }
-          ].map((item) => (
-            <div key={item.title} className="bg-white shadow-lg p-6 rounded-2xl">
-              <div className="text-4xl">{item.emoji}</div>
-              <h3 className="text-xl font-semibold mt-2">{item.title}</h3>
-              <p className="text-gray-600 mt-1">{item.desc}</p>
-            </div>
+          {cardData.map((card) => (
+            <Card
+              key={card.title}
+              title={card.title}
+              description={card.description}
+              emoji={card.emoji}
+            />
           ))}
         </div>
       </section>
