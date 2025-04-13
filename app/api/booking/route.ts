@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const data = await req.json();
-  console.log('Booking received:', data);
+  try {
+    const data = await req.json();
 
-  return NextResponse.json({ message: 'Success' }, { status: 200 });
+    // Just log it for now — TODO write to DB, file, or send email
+    console.log('New Booking:', data);
+
+    return NextResponse.json({ message: 'Booking received' }, { status: 200 });
+  } catch (error) {
+    console.error('Booking Error:', error);
+    return NextResponse.json({ error: 'Failed to process booking' }, { status: 500 });
+  }
 }
