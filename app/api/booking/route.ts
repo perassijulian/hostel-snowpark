@@ -1,15 +1,18 @@
-import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export async function POST(req: Request) {
   try {
     const data = await req.json();
 
-    // Just log it for now — TODO write to DB, file, or send email
-    console.log('New Booking:', data);
+    const newBooking = await prisma.booking.create({
+      data
+    });
 
-    return NextResponse.json({ message: 'Booking received' }, { status: 200 });
+    return Response.json(newBooking);
   } catch (error) {
     console.error('Booking Error:', error);
-    return NextResponse.json({ error: 'Failed to process booking' }, { status: 500 });
+    return Response.json({ error: 'Failed to process booking' }, { status: 500 });
   }
 }

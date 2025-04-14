@@ -24,11 +24,34 @@ export default function BookingPage() {
     e.preventDefault();
     setStatus('submitting');
 
+    const { checkIn, checkOut, guests, type, name, email, phone } = formData;
+
+    // Convert check-in and check-out to Date objects before sending them to the backend
+    const startDate = new Date(checkIn);
+    const endDate = new Date(checkOut);
+
+    // Make sure the dates are valid
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      console.error('Invalid dates');
+      throw new Error('Failed to format dates')
+      return;
+    }
+
+    const bookingData = {
+      name,
+      email,
+      phone,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      guests,
+      type,
+    };
+
     try {
       const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(bookingData),
       });
 
       if (res.ok) {
