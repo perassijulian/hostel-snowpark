@@ -29,7 +29,7 @@ export default function VolunteerPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 mt-10">
+    <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Volunteer With Us</h1>
       {submitted ? (
         <p className="text-green-500">Thanks for your interest! We'll be in touch.</p>

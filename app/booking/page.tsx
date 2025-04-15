@@ -74,7 +74,7 @@ export default function BookingPage() {
   };
 
   return (
-    <main className="max-w-xl mx-auto p-6 mt-10">
+    <main className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
 
       <form onSubmit={handleSubmit} className="grid gap-4">
