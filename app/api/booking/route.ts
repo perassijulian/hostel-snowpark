@@ -1,18 +1,79 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
+    const body = await req.json();
+    const { name, email, phone, startDate, endDate, guests, type } = body;
 
+    // 🔐 Validate fields
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !startDate ||
+      !endDate ||
+      !guests ||
+      !type
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 }
+      );
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return NextResponse.json(
+        { error: "Invalid date format" },
+        { status: 400 }
+      );
+    }
+
+    if (start >= end) {
+      return NextResponse.json(
+        { error: "Start date must be before end date" },
+        { status: 400 }
+      );
+    }
+
+    if (typeof guests !== "number" || guests < 1) {
+      return NextResponse.json(
+        { error: "Invalid number of guests" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ All good, create booking
     const newBooking = await prisma.booking.create({
-      data
+      data: {
+        name,
+        email,
+        phone,
+        startDate: start,
+        endDate: end,
+        guests,
+        type,
+      },
     });
 
-    return Response.json(newBooking);
+    return NextResponse.json(newBooking);
   } catch (error) {
-    console.error('Booking Error:', error);
-    return Response.json({ error: 'Failed to process booking' }, { status: 500 });
+    console.error("Booking Error:", error);
+    return NextResponse.json(
+      { error: "Failed to process booking" },
+      { status: 500 }
+    );
   }
 }
