@@ -121,8 +121,12 @@ export default function BookingPage() {
   return (
     <main className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
-
-      <form onSubmit={handleSubmit} className="grid gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className={`grid gap-4 duration-200 ${
+          status === "submitting" ? "opacity-50 pointer-events-none" : ""
+        }`}
+      >
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block mb-1">Check-in</label>
