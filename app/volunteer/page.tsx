@@ -1,38 +1,82 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function VolunteerPage() {
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    message: '',
+    name: "",
+    email: "",
+    message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch('/api/volunteer', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+    setStatus("submitting");
 
-    if (res.ok) {
-      setSubmitted(true);
-      setForm({ name: '', email: '', message: '' });
+    const { name, email, message } = form;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Make sure email is correctly formatted
+    if (!emailRegex.test(email)) {
+      console.error("Invalid email format");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure name is not empty
+    if (name === "") {
+      console.error("Name should not be empty");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure message is not empty
+    if (message === "") {
+      console.error("Message should not be empty");
+      setStatus("error");
+      return;
+    }
+
+    const volunteerData = {
+      name,
+      email,
+      message,
+    };
+
+    try {
+      const res = await fetch("/api/volunteer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(volunteerData),
+      });
+
+      if (res.ok) {
+        setStatus("success");
+        setForm({ name: "", email: "", message: "" });
+      } else {
+        throw new Error("Failed to submit");
+      }
+    } catch (error) {
+      setStatus("error");
     }
   };
 
   return (
     <div className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Volunteer With Us</h1>
-      {submitted ? (
-        <p className="text-green-500">Thanks for your interest! We'll be in touch.</p>
+      {status === "success" ? (
+        <p className="text-green-500">
+          Thanks for your interest! We'll be in touch.
+        </p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
