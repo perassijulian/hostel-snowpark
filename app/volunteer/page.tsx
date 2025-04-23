@@ -78,7 +78,12 @@ export default function VolunteerPage() {
           Thanks for your interest! We'll be in touch.
         </p>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className={`space-y-4 ${
+            status === "submitting" ? "opacity-50 pointer-events-none" : ""
+          }`}
+        >
           <input
             type="text"
             name="name"
