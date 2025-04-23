@@ -105,12 +105,18 @@ export default function VolunteerPage() {
             rows={4}
             className="w-full p-2 border rounded"
           />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Send
-          </button>
+          {status === "error" ? (
+            <p className="text-red-500">
+              Sorry, your proposal was not submitted. Please try again.
+            </p>
+          ) : (
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              {status === "submitting" ? " Submitting..." : "Send"}
+            </button>
+          )}
         </form>
       )}
     </div>
