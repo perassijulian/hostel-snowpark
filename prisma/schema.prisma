@@ -18,3 +18,11 @@ model Booking {
   type      String
   createdAt DateTime @default(now())
 }
+
+model Volunteer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
