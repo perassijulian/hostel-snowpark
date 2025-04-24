@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, phone, startDate, endDate, guests, type } = body;
+    const guests = Number(body.guests);
+    const { name, email, phone, startDate, endDate, type } = body;
 
     // 🔐 Validate fields
     if (
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (typeof guests !== "number" || guests < 1) {
+    if (!Number.isInteger(guests) || guests < 1) {
       return NextResponse.json(
         { error: "Invalid number of guests" },
         { status: 400 }
