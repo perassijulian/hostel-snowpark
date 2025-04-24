@@ -21,13 +21,13 @@ export default function Navbar() {
           <Link href="/" className="hover:text-black cursor-pointer">
             Home
           </Link>
-          <Link href="volunteer" className="hover:text-black cursor-pointer">
+          <Link href="/volunteer" className="hover:text-black cursor-pointer">
             Volunteer
           </Link>
-          <Link href="booking" className="hover:text-black cursor-pointer">
+          <Link href="/booking" className="hover:text-black cursor-pointer">
             Booking
           </Link>
-          <Link href="contact" className="hover:text-black cursor-pointer">
+          <Link href="/contact" className="hover:text-black cursor-pointer">
             Contact
           </Link>
         </ul>
@@ -54,7 +54,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link
-              href="volunteer"
+              href="/volunteer"
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -65,7 +65,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link
-              href="booking"
+              href="/booking"
               onClick={() => {
                 setIsOpen(false);
               }}
@@ -76,7 +76,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link
-              href="contact"
+              href="/contact"
               onClick={() => {
                 setIsOpen(false);
               }}
