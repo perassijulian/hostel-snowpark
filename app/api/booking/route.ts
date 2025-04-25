@@ -55,6 +55,7 @@ export async function POST(req: Request) {
     }
 
     // Check for date overlap
+    console.log("checking for overlap");
     const clash = await prisma.booking.findFirst({
       where: {
         type,
@@ -70,11 +71,12 @@ export async function POST(req: Request) {
     if (clash) {
       return NextResponse.json(
         {
-          message: "Dates unavailable",
+          error: "Selected dates are unavailable. Please try another range",
         },
         { status: 409 }
       );
     }
+    console.log("checking for overlap chekced");
 
     // All good, create booking
     const newBooking = await prisma.booking.create({

@@ -16,8 +16,8 @@ export default function BookingPage() {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
-  // TODO
-  // const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -34,7 +34,7 @@ export default function BookingPage() {
 
     // Make sure email is correctly formatted
     if (!emailRegex.test(email)) {
-      console.error("Invalid email format");
+      setErrorMessage("Invalid email format");
       setStatus("error");
       return;
     }
@@ -43,33 +43,30 @@ export default function BookingPage() {
     const startDate = new Date(checkIn);
     const endDate = new Date(checkOut);
 
-    // TODO
-    // setErrorMessage on the validations
-
     // Make sure the dates are valid
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      console.error("Invalid dates");
+      setErrorMessage("Invalid dates");
       setStatus("error");
       return;
     }
 
     // Make sure the dates are secuential
     if (startDate >= endDate) {
-      console.error("End date is before or same as start date");
+      setErrorMessage("End date is before or same as start date");
       setStatus("error");
       return;
     }
 
     // Make sure guests is a positive number
     if (guests < 1) {
-      console.error("Guests is smaller than 1");
+      setErrorMessage("Guests should be a positive integer");
       setStatus("error");
       return;
     }
 
     // Make sure name is not empty
     if (name === "") {
-      console.error("Name should not be empty");
+      setErrorMessage("Name should not be empty");
       setStatus("error");
       return;
     }
@@ -77,7 +74,7 @@ export default function BookingPage() {
     // Make sure phone is not empty
     // TODO: check phone number length
     if (phone === "") {
-      console.error("Phone should not be empty");
+      setErrorMessage("Phone should not be empty");
       setStatus("error");
       return;
     }
@@ -98,6 +95,12 @@ export default function BookingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData),
       });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setErrorMessage(result.error);
+      }
 
       if (res.ok) {
         setStatus("success");
@@ -228,7 +231,7 @@ export default function BookingPage() {
           <p className="text-green-600 mt-2">Booking submitted successfully!</p>
         )}
         {status === "error" && (
-          <p className="text-red-600 mt-2">Something went wrong. Try again.</p>
+          <p className="text-red-600 mt-2">{errorMessage}</p>
         )}
       </form>
     </main>
