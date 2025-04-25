@@ -54,7 +54,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ All good, create booking
+    // Check for date overlap
+    const clash = await prisma.booking.findFirst({
+      where: {
+        type,
+        OR: [
+          {
+            startDate: { lte: end },
+            endDate: { gte: start },
+          },
+        ],
+      },
+    });
+
+    if (clash) {
+      return NextResponse.json(
+        {
+          message: "Dates unavailable",
+        },
+        { status: 409 }
+      );
+    }
+
+    // All good, create booking
     const newBooking = await prisma.booking.create({
       data: {
         name,
