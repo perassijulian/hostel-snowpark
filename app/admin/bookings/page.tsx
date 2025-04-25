@@ -9,7 +9,7 @@ export default async function AdminBookings() {
   });
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
+    <main className="p-6 max-w-4xl mx-auto h-full overflow-auto">
       <h1 className="text-3xl font-bold mb-6">All Bookings</h1>
 
       {bookings.length === 0 ? (
