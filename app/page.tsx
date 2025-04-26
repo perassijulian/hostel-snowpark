@@ -29,10 +29,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white text-gray-800">
       {/* Hero */}
-      <section
-        className="relative h-screen bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/hero.jpg')" }}
-      >
+      <section className="relative h-screen bg-cover bg-center bg-[url('/images/hero.jpg')]">
         <div className="absolute inset-0 bg-black/60 flex flex-col justify-center items-center text-white text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold">
             Snowboarding. Community. Patagonia.
