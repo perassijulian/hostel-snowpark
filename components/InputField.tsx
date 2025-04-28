@@ -6,9 +6,12 @@ interface InputFieldProps {
   name: string;
   value: string | number;
   onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => void;
   required?: boolean;
+  min?: string;
 }
 
 export default function InputField({
@@ -18,6 +21,7 @@ export default function InputField({
   value,
   onChange,
   required = false,
+  min,
 }: InputFieldProps) {
   return (
     <div>
@@ -29,6 +33,7 @@ export default function InputField({
         onChange={onChange}
         className="w-full border px-3 py-2 rounded"
         required={required}
+        min={min}
       />
     </div>
   );

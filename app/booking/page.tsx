@@ -1,5 +1,7 @@
 "use client";
 
+import InputField from "@/components/InputField";
+import SelectField from "@/components/SelectField";
 import { useState } from "react";
 
 export default function BookingPage() {
@@ -19,7 +21,9 @@ export default function BookingPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -131,93 +135,72 @@ export default function BookingPage() {
         }`}
       >
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block mb-1">Check-in</label>
-            <input
-              type="date"
-              name="checkIn"
-              value={formData.checkIn}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">Check-out</label>
-            <input
-              type="date"
-              name="checkOut"
-              value={formData.checkOut}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-              required
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-1">Guests</label>
-          <input
-            type="number"
-            name="guests"
-            min="1"
-            value={formData.guests}
+          <InputField
+            label="Check-In"
+            type="date"
+            name="checkIn"
+            value={formData.checkIn}
             onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
+            required
+          />
+
+          <InputField
+            label="Check-Out"
+            type="date"
+            name="checkOut"
+            value={formData.checkOut}
+            onChange={handleChange}
             required
           />
         </div>
 
-        <div>
-          <label className="block mb-1">Accommodation Type</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-          >
-            <option value="dorm">Dorm</option>
-            <option value="cabin">Cabin</option>
-            <option value="private">Private Room</option>
-          </select>
-        </div>
+        <InputField
+          label="Guests"
+          type="number"
+          name="guests"
+          min="1"
+          value={formData.guests}
+          onChange={handleChange}
+          required
+        />
 
-        <div>
-          <label className="block mb-1">Full Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
+        <SelectField
+          label="Accomodation Type"
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          options={[
+            { value: "dorm", label: "Dorm" },
+            { value: "cabin", label: "Cabin" },
+            { value: "private", label: "Private Room" },
+          ]}
+        />
 
-        <div>
-          <label className="block mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
+        <InputField
+          label="Full Name"
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
 
-        <div>
-          <label className="block mb-1">Phone</label>
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
+        <InputField
+          label="Email"
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        <InputField
+          label="Phone"
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          required
+        />
 
         <button
           type="submit"

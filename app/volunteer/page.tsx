@@ -1,5 +1,7 @@
 "use client";
 
+import InputField from "@/components/InputField";
+import TextAreaField from "@/components/TextAreaField";
 import { useState } from "react";
 
 export default function VolunteerPage() {
@@ -13,7 +15,9 @@ export default function VolunteerPage() {
   >("idle");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -84,31 +88,31 @@ export default function VolunteerPage() {
             status === "submitting" ? "opacity-50 pointer-events-none" : ""
           }`}
         >
-          <input
+          <InputField
+            label="Name"
             type="text"
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="Name"
             required
-            className="w-full p-2 border rounded"
           />
-          <input
+
+          <InputField
+            label="Email"
             type="email"
             name="email"
             value={form.email}
             onChange={handleChange}
-            placeholder="Email"
             required
-            className="w-full p-2 border rounded"
           />
-          <textarea
+
+          <TextAreaField
+            label="Why do you want to volunteer?"
             name="message"
             value={form.message}
             onChange={handleChange}
-            placeholder="Why do you want to volunteer?"
+            required
             rows={4}
-            className="w-full p-2 border rounded"
           />
           {status === "error" ? (
             <p className="text-red-500">

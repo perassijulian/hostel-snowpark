@@ -25,7 +25,7 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
         value={value}
         onChange={onChange}
         required={required}
-        className="w-full border-gray-300 rounded-md p-2"
+        className="w-full p-2 border rounded"
         rows={rows}
       />
     </div>

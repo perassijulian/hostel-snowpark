@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import InputField from "../../../../components/InputField";
-//import SelectField from "../../../../components/SelectField";
+import TextAreaField from "../../../../components/TextAreaField";
 
 export default function NewAccommodationPage() {
   const router = useRouter();
@@ -15,7 +15,9 @@ export default function NewAccommodationPage() {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -44,7 +46,7 @@ export default function NewAccommodationPage() {
   };
 
   return (
-    <main className="p-6 max-w-2xl mx-auto">
+    <main className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">New Accommodation</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,13 +75,13 @@ export default function NewAccommodationPage() {
           type="number"
         />
 
-        {/** <TextAreaField
+        <TextAreaField
           label="Description"
           name="description"
           value={formData.description}
           onChange={handleChange}
           required
-  /> **/}
+        />
 
         <div className="flex justify-end space-x-2">
           <button
