@@ -39,8 +39,8 @@ export default function AdminLayout({
           <a href="/admin/bookings" className="block hover:text-gray-300">
             Bookings
           </a>
-          <a href="/admin/users" className="block hover:text-gray-300">
-            Users
+          <a href="/admin/accomodations" className="block hover:text-gray-300">
+            Accomodations
           </a>
         </nav>
       </aside>

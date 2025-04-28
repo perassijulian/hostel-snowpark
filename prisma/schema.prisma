@@ -26,3 +26,13 @@ model Volunteer {
   message   String
   createdAt DateTime @default(now())
 }
+
+model Accommodation {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  type        String   // Example: "dorm", "private", "suite"
+  price       Float
+  guests      Int
+  createdAt   DateTime @default(now())
+}
