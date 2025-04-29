@@ -15,6 +15,11 @@ export default function NewAccommodationPage() {
     guests: 1,
   });
 
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -25,6 +30,7 @@ export default function NewAccommodationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setStatus("submitting");
 
     try {
       const res = await fetch("/api/admin/accommodations", {
@@ -37,11 +43,14 @@ export default function NewAccommodationPage() {
       });
 
       if (res.ok) {
+        setStatus("success");
         router.push("/admin/accommodations");
       } else {
+        setStatus("error");
         console.error("Failed to create accommodation");
       }
     } catch (err) {
+      setStatus("error");
       console.error(err);
     }
   };
@@ -102,9 +111,12 @@ export default function NewAccommodationPage() {
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition"
+            className={`px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition ${
+              status === "submitting" ? "pointer-none hover:bg-gray-800" : ""
+            }`}
+            disabled={status === "submitting"}
           >
-            Save
+            {status === "submitting" ? "Submiting..." : "Save"}
           </button>
         </div>
       </form>
