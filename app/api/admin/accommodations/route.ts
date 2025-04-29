@@ -3,6 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth"; // Your NextAuth config
 
+export async function GET() {
+  const accommodations = await prisma.accommodation.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return NextResponse.json(accommodations);
+}
+
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
@@ -16,7 +23,6 @@ export async function POST(req: Request) {
     const guests = Number(body.guests);
     const { name, type, price, description } = body;
 
-    console.log(body);
     if (!name || !type || !price || !description || !guests) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
@@ -30,8 +36,6 @@ export async function POST(req: Request) {
         guests,
       },
     });
-
-    console.log(newAccommodation);
 
     return NextResponse.json(newAccommodation, { status: 201 });
   } catch (error) {
