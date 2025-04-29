@@ -6,7 +6,8 @@ export async function middleware(req: any) {
   const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
 
   if (isAdminRoute && !token) {
-    return NextResponse.redirect(new URL("/login"), req.url);
+    const loginUrl = new URL("/login", req.nextUrl.origin);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
