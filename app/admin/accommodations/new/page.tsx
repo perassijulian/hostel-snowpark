@@ -12,6 +12,7 @@ export default function NewAccommodationPage() {
     type: "",
     price: "",
     description: "",
+    guests: 1,
   });
 
   const handleChange = (
@@ -26,7 +27,7 @@ export default function NewAccommodationPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/admin/accomodations", {
+      const res = await fetch("/api/admin/accommodations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,6 +71,14 @@ export default function NewAccommodationPage() {
           label="Price per Night"
           name="price"
           value={formData.price}
+          onChange={handleChange}
+          required
+          type="number"
+        />
+        <InputField
+          label="Guests"
+          name="guests"
+          value={formData.guests}
           onChange={handleChange}
           required
           type="number"

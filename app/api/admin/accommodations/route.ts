@@ -1,0 +1,44 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth"; // Your NextAuth config
+
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+
+    const guests = Number(body.guests);
+    const { name, type, price, description } = body;
+
+    console.log(body);
+    if (!name || !type || !price || !description || !guests) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    const newAccommodation = await prisma.accommodation.create({
+      data: {
+        name,
+        type,
+        price,
+        description,
+        guests,
+      },
+    });
+
+    console.log(newAccommodation);
+
+    return NextResponse.json(newAccommodation, { status: 201 });
+  } catch (error) {
+    console.error("Error creating accommodation:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}
