@@ -1,4 +1,5 @@
 "use client";
+import { signOut } from "next-auth/react";
 
 export default function AdminLayout({
   children,
@@ -19,6 +20,12 @@ export default function AdminLayout({
           <a href="/admin/accommodations" className="block hover:text-gray-300">
             Accommodations
           </a>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="block mt-2 text-left w-full hover:text-red-400 cursor-pointer text-red-600"
+          >
+            Log Out
+          </button>
         </nav>
       </aside>
       <main className="flex-1 p-8">{children}</main>
