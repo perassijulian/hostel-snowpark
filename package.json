@@ -11,12 +11,14 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",
     "@prisma/client": "^6.6.0",
+    "@uploadthing/react": "^7.3.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.487.0",
     "next": "15.3.0",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "uploadthing": "^7.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

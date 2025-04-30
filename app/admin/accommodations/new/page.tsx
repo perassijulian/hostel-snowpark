@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import InputField from "../../../../components/InputField";
-import TextAreaField from "../../../../components/TextAreaField";
+import InputField from "@/components/InputField";
+import TextAreaField from "@/components/TextAreaField";
+import { UploadButton } from "@/utils/uploadthing";
+import { ClientUploadedFileData } from "uploadthing/types";
+import Link from "next/link";
 
 export default function NewAccommodationPage() {
   const router = useRouter();
@@ -13,6 +16,7 @@ export default function NewAccommodationPage() {
     price: "",
     description: "",
     guests: 1,
+    pictures: [] as string[],
   });
 
   const [status, setStatus] = useState<
@@ -101,18 +105,51 @@ export default function NewAccommodationPage() {
           required
         />
 
-        <input
-          type="file"
-          name="images"
-          accept="image/*"
-          multiple
-          className="block w-full text-sm text-gray-500
-             file:mr-4 file:py-2 file:px-4
-             file:rounded-full file:border-0
-             file:text-sm file:font-semibold
-             file:bg-blue-50 file:text-blue-700
-             hover:file:bg-blue-100"
+        <UploadButton
+          endpoint="imageUploader"
+          onClientUploadComplete={(res) => {
+            if (!res) return;
+            const urls = res.map((file) => file.url);
+            setFormData((prev) => ({
+              ...prev,
+              pictures: [...prev.pictures, ...urls],
+            }));
+          }}
+          onUploadError={(error: Error) => {
+            // Do something with the error.
+            alert(`ERROR! ${error.message}`);
+          }}
         />
+
+        {formData.pictures.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold mt-4 mb-2">
+              Uploaded Pictures:
+            </h2>
+            <ul className="space-y-2">
+              {formData.pictures.map((URL, index) => (
+                <li
+                  key={URL}
+                  className="flex items-center space-x-4 bg-gray-100 p-2 rounded-md shadow-sm"
+                >
+                  <img
+                    src={URL}
+                    alt={`Foto ${index + 1}`}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                  <Link
+                    href={URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {`Foto ${index + 1}`}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="flex justify-end space-x-2">
           <button
