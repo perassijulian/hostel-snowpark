@@ -28,13 +28,24 @@ model Volunteer {
 }
 
 model Accommodation {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String
-  type        String   // Example: "dorm", "private", "suite"
+  type        String    // Example: "dorm", "private", "suite"
   price       Float
   guests      Int
-  createdAt   DateTime @default(now())
+  pictures    Picture[] @relation("AccommodationPictures")
+  createdAt   DateTime  @default(now())
+}
+
+model Picture {
+  id              Int           @id @default(autoincrement())
+  url             String
+  accommodation   Accommodation? @relation("AccommodationPictures", fields: [accommodationId], references: [id])
+  accommodationId Int?
+  isPrimary       Boolean
+  caption         String?
+  altText         String?
 }
 
 model Account {
