@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth"; // Your NextAuth config
+import { PictureForm } from "@/types/accommodation";
 
 export async function GET() {
   const accommodations = await prisma.accommodation.findMany({
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const guests = Number(body.guests);
-    const { name, type, price, description } = body;
+    const { name, type, price, description, pictures } = body;
 
     if (!name || !type || !price || !description || !guests) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -34,6 +35,14 @@ export async function POST(req: NextRequest) {
         price,
         description,
         guests,
+        pictures: {
+          create: pictures.map((pic: PictureForm) => ({
+            url: pic.url,
+            isPrimary: pic.isPrimary || false,
+            caption: pic.caption || "",
+            altText: pic.altText || "",
+          })),
+        },
       },
     });
 

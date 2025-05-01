@@ -6,13 +6,7 @@ import InputField from "@/components/InputField";
 import TextAreaField from "@/components/TextAreaField";
 import { UploadButton } from "@/utils/uploadthing";
 import Link from "next/link";
-
-type PictureForm = {
-  url: string;
-  isPrimary: boolean;
-  caption?: string;
-  altText?: string;
-};
+import { PictureForm } from "@/types/accommodation";
 
 export default function NewAccommodationPage() {
   const router = useRouter();
