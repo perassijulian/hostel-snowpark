@@ -5,8 +5,14 @@ import { useRouter } from "next/navigation";
 import InputField from "@/components/InputField";
 import TextAreaField from "@/components/TextAreaField";
 import { UploadButton } from "@/utils/uploadthing";
-import { ClientUploadedFileData } from "uploadthing/types";
 import Link from "next/link";
+
+type PictureForm = {
+  url: string;
+  isPrimary: boolean;
+  caption?: string;
+  altText?: string;
+};
 
 export default function NewAccommodationPage() {
   const router = useRouter();
@@ -16,13 +22,14 @@ export default function NewAccommodationPage() {
     price: "",
     description: "",
     guests: 1,
-    pictures: [] as string[],
+    pictures: [] as PictureForm[],
   });
 
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -37,6 +44,39 @@ export default function NewAccommodationPage() {
     setStatus("submitting");
 
     try {
+      // Validate form data
+      if (!formData.name || !formData.type || !formData.price) {
+        setStatus("error");
+        setErrorMessage("Please fill in all required fields.");
+        return;
+      }
+      if (Number(formData.price) <= 0) {
+        setStatus("error");
+        setErrorMessage("Price must be greater than 0.");
+        return;
+      }
+      if (Number(formData.guests) <= 0) {
+        setStatus("error");
+        setErrorMessage("Number of guests must be greater than 0.");
+        return;
+      }
+      if (formData.pictures.length === 0) {
+        setStatus("error");
+        setErrorMessage("Please upload at least one picture.");
+        return;
+      }
+      if (formData.description.length < 10) {
+        setStatus("error");
+        setErrorMessage("Description must be at least 10 characters long.");
+        return;
+      }
+      if (formData.description.length > 500) {
+        setStatus("error");
+        setErrorMessage("Description must be less than 500 characters.");
+        return;
+      }
+
+      // Submit form data to the server
       const res = await fetch("/api/admin/accommodations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,40 +145,67 @@ export default function NewAccommodationPage() {
           required
         />
 
+        <label className="block mb-1">Uploaded Pictures:</label>
+
         <UploadButton
           endpoint="imageUploader"
+          onUploadBegin={() => setIsUploading(true)}
           onClientUploadComplete={(res) => {
             if (!res) return;
-            const urls = res.map((file) => file.url);
+            const uploadedPictures: PictureForm[] = res.map((file, index) => ({
+              url: file.url,
+              isPrimary: formData.pictures.length === 0 && index === 0, // first image = primary
+            }));
             setFormData((prev) => ({
               ...prev,
-              pictures: [...prev.pictures, ...urls],
+              pictures: [...prev.pictures, ...uploadedPictures],
             }));
+            setIsUploading(false);
           }}
           onUploadError={(error: Error) => {
             // Do something with the error.
             alert(`ERROR! ${error.message}`);
+            setIsUploading(false);
           }}
         />
 
         {formData.pictures.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mt-4 mb-2">
-              Uploaded Pictures:
-            </h2>
             <ul className="space-y-2">
-              {formData.pictures.map((URL, index) => (
+              {formData.pictures.map((picture, index) => (
                 <li
-                  key={URL}
-                  className="flex items-center space-x-4 bg-gray-100 p-2 rounded-md shadow-sm"
+                  key={picture.url}
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      pictures: prev.pictures.map((p, i) => ({
+                        ...p,
+                        isPrimary: i === index,
+                      })),
+                    }));
+                  }}
+                  className={`flex items-center space-x-4 p-2 rounded-md shadow-sm cursor-pointer transition 
+                    ${
+                      picture.isPrimary
+                        ? "bg-blue-100 border border-blue-400"
+                        : "bg-gray-100 hover:bg-gray-200"
+                    }`}
                 >
-                  <img
-                    src={URL}
-                    alt={`Foto ${index + 1}`}
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
+                  <div className="relative">
+                    <img
+                      src={picture.url}
+                      alt={`Foto ${index + 1}`}
+                      className="w-16 h-16 object-cover rounded-md"
+                    />
+                    {picture.isPrimary && (
+                      <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
+                        Primary
+                      </span>
+                    )}
+                  </div>
+
                   <Link
-                    href={URL}
+                    href={picture.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"
@@ -162,11 +229,13 @@ export default function NewAccommodationPage() {
           <button
             type="submit"
             className={`px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition ${
-              status === "submitting" ? "pointer-none hover:bg-gray-800" : ""
+              status === "submitting" || isUploading
+                ? "pointer-none hover:bg-gray-800"
+                : ""
             }`}
-            disabled={status === "submitting"}
+            disabled={status === "submitting" || isUploading}
           >
-            {status === "submitting" ? "Submiting..." : "Save"}
+            {status === "submitting" || isUploading ? "Submiting..." : "Save"}
           </button>
         </div>
       </form>
