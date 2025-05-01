@@ -1,19 +1,8 @@
 "use client";
 
+import { Accommodation } from "@/types/accommodation";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-
-type Accommodation = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  guests: number;
-  pictures: {
-    url: string;
-    isPrimary: boolean;
-    altText?: string;
-  }[];
-};
 
 export default function AccommodationsPage() {
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
@@ -56,9 +45,11 @@ export default function AccommodationsPage() {
           accom.pictures.find((p) => p.isPrimary) || accom.pictures[0];
 
         return (
-          <div
+          <Link
             key={accom.id}
-            className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow"
+            href={`/accommodation/${accom.id}`}
+            className="block bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow"
+            aria-label={`View details for ${accom.name}`}
           >
             <img
               src={primaryImage?.url}
@@ -70,7 +61,7 @@ export default function AccommodationsPage() {
             <div className="mt-2 text-sm text-gray-500">
               {accom.guests} guests · ${accom.price}/night
             </div>
-          </div>
+          </Link>
         );
       })}
     </div>
