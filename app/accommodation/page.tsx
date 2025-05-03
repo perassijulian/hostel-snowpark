@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { Accommodation } from "@/types/accommodation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -23,11 +24,7 @@ export default function AccommodationsPage() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Loading accommodations...
-      </div>
-    );
+    return <LoadingSpinner description="Loading accommodations..." />;
   }
 
   if (accommodations.length === 0) {
