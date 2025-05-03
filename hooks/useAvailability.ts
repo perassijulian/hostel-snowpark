@@ -1,7 +1,16 @@
+import { Accommodation } from "@/types/accommodation";
 import { useState, useEffect } from "react";
 
-export function useAvailability(params: any) {
+type AvailabilityParams = {
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  type: string;
+} | null;
+
+export function useAvailability(params: AvailabilityParams) {
   const [availability, setAvailability] = useState<boolean | null>(null);
+  const [accommodation, setAccommodation] = useState<Accommodation[] | []>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { checkIn, checkOut, guests, type } = params || {};
@@ -19,8 +28,8 @@ export function useAvailability(params: any) {
         if (!res.ok) throw new Error("Error checking availability.");
 
         const data = await res.json();
-        console.log("Availability data:", data);
-        setAvailability(data.isAvailable);
+        setAvailability(data.lenghth > 0);
+        setAccommodation(data);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "An unknown error occurred."
@@ -34,5 +43,5 @@ export function useAvailability(params: any) {
     checkAvailability();
   }, [params?.checkIn, params?.checkOut, params?.guests, params?.type]);
 
-  return { availability, loading, error };
+  return { accommodation, availability, loading, error };
 }

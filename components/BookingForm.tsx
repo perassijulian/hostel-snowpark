@@ -110,8 +110,8 @@ export default function BookingForm({
       />
 
       {/* Show availability or loading state */}
-      {loading && <p>Loading availability...</p>}
-      {error && <p>Failed to fetch availability</p>}
+      {loading && <p>Checking availability...</p>}
+      {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
       {availability && (
         <div>
           <h3>Available Rooms:</h3>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BookingForm from "@/components/BookingForm";
 import { useAvailability } from "@/hooks/useAvailability";
+import AccommodationAvailable from "@/components/AccommodationAvailable";
 
 export default function BookingPage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function BookingPage() {
   // Only fetch availability if all are defined
   const shouldFetchAvailability = checkIn && checkOut && guests && type;
 
-  const { availability, loading, error } = useAvailability(
+  const { accommodation, availability, loading, error } = useAvailability(
     shouldFetchAvailability ? { checkIn, checkOut, guests, type } : null
   );
 
@@ -162,6 +163,8 @@ export default function BookingPage() {
         error={error}
         onChange={handleChange}
       />
+
+      <AccommodationAvailable available={accommodation} />
     </main>
   );
 }
