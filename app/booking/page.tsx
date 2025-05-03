@@ -1,18 +1,25 @@
 "use client";
 
-import InputField from "@/components/InputField";
-import SelectField from "@/components/SelectField";
-
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import BookingForm from "@/components/BookingForm";
+import { useAvailability } from "@/hooks/useAvailability";
 
 export default function BookingPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const type = searchParams.get("type");
   const checkIn = searchParams.get("checkIn");
   const checkOut = searchParams.get("checkOut");
   const guests = searchParams.get("guests");
+
+  // Only fetch availability if all are defined
+  const shouldFetchAvailability = checkIn && checkOut && guests && type;
+
+  const { availability, loading, error } = useAvailability(
+    shouldFetchAvailability ? { checkIn, checkOut, guests, type } : null
+  );
 
   const [formData, setFormData] = useState({
     checkIn: "",
@@ -23,15 +30,16 @@ export default function BookingPage() {
     email: "",
     phone: "",
   });
-
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const isAvailable = availability && !loading && !error;
+
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
     const { name, value } = e.target;
@@ -39,7 +47,6 @@ export default function BookingPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setStatus("submitting");
 
     const { checkIn, checkOut, guests, type, name, email, phone } = formData;
@@ -103,6 +110,12 @@ export default function BookingPage() {
     };
 
     try {
+      router.push(
+        `/booking?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&type=${type}`
+      );
+
+      {
+        /* Booking logic
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,6 +142,8 @@ export default function BookingPage() {
       } else {
         throw new Error("Failed to submit");
       }
+      */
+      }
     } catch (err) {
       setStatus("error");
     }
@@ -137,95 +152,16 @@ export default function BookingPage() {
   return (
     <main className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
-      <form
+      <BookingForm
         onSubmit={handleSubmit}
-        className={`grid gap-4 duration-200 ${
-          status === "submitting" ? "opacity-50 pointer-events-none" : ""
-        }`}
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <InputField
-            label="Check-In"
-            type="date"
-            name="checkIn"
-            value={formData.checkIn}
-            onChange={handleChange}
-            required
-          />
-
-          <InputField
-            label="Check-Out"
-            type="date"
-            name="checkOut"
-            value={formData.checkOut}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <InputField
-          label="Guests"
-          type="number"
-          name="guests"
-          min="1"
-          value={formData.guests}
-          onChange={handleChange}
-          required
-        />
-
-        <SelectField
-          label="Accomodation Type"
-          name="type"
-          value={formData.type}
-          onChange={handleChange}
-          options={[
-            { value: "dorm", label: "Dorm" },
-            { value: "cabin", label: "Cabin" },
-            { value: "private", label: "Private Room" },
-          ]}
-        />
-
-        <InputField
-          label="Full Name"
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-
-        <InputField
-          label="Email"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <InputField
-          label="Phone"
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-        />
-
-        <button
-          type="submit"
-          disabled={status === "submitting"}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition"
-        >
-          {status === "submitting" ? "Submitting..." : "Book Now"}
-        </button>
-
-        {status === "success" && (
-          <p className="text-green-600 mt-2">Booking submitted successfully!</p>
-        )}
-        {status === "error" && (
-          <p className="text-red-600 mt-2">{errorMessage}</p>
-        )}
-      </form>
+        formData={formData}
+        status={status}
+        errorMessage={errorMessage}
+        availability={availability}
+        loading={loading}
+        error={error}
+        onChange={handleChange}
+      />
     </main>
   );
 }

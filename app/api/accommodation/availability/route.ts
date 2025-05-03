@@ -63,6 +63,8 @@ export async function GET(req: Request) {
       },
     });
 
+    console.log(acc);
+
     if (!overlappingBookings) {
       available.push(acc);
     }
