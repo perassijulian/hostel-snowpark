@@ -12,13 +12,13 @@ model Booking {
   name      String
   email     String
   phone     String
-  startDate   DateTime
-  endDate  DateTime
+  startDate DateTime
+  endDate   DateTime
   guests    Int
   createdAt DateTime @default(now())
 
-    // Relations
-  accommodation  Accommodation @relation(fields: [accommodationId], references: [id])
+  // Relations
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
   accommodationId Int
 }
 
@@ -34,15 +34,18 @@ model Accommodation {
   id          Int       @id @default(autoincrement())
   name        String
   description String
-  type        String    // Example: "dorm", "private", "suite"
+  type        String // Example: "dorm", "private", "suite"
   price       Float
   guests      Int
   pictures    Picture[] @relation("AccommodationPictures")
   createdAt   DateTime  @default(now())
+
+  //Relations
+  bookings Booking[]
 }
 
 model Picture {
-  id              Int           @id @default(autoincrement())
+  id              Int            @id @default(autoincrement())
   url             String
   accommodation   Accommodation? @relation("AccommodationPictures", fields: [accommodationId], references: [id])
   accommodationId Int?
@@ -52,19 +55,19 @@ model Picture {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? 
-  access_token       String? 
-  expires_at         Int?    
-  token_type         String? 
-  scope              String? 
-  id_token           String? 
-  session_state      String? 
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -78,13 +81,13 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?    
-  email         String?    @unique
-  emailVerified DateTime? 
-  image         String?    
-  accounts      Account[] 
-  sessions      Session[] 
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model VerificationToken {

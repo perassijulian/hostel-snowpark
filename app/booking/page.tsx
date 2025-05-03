@@ -2,9 +2,18 @@
 
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
+
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function BookingPage() {
+  const searchParams = useSearchParams();
+
+  const type = searchParams.get("type");
+  const checkIn = searchParams.get("checkIn");
+  const checkOut = searchParams.get("checkOut");
+  const guests = searchParams.get("guests");
+
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
