@@ -36,7 +36,7 @@ export default function AccommodationsPage() {
   }
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid m-4 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {accommodations.map((accom) => {
         const primaryImage =
           accom.pictures.find((p) => p.isPrimary) || accom.pictures[0];

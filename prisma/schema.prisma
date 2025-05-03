@@ -15,8 +15,11 @@ model Booking {
   startDate   DateTime
   endDate  DateTime
   guests    Int
-  type      String
   createdAt DateTime @default(now())
+
+    // Relations
+  accommodation  Accommodation @relation(fields: [accommodationId], references: [id])
+  accommodationId Int
 }
 
 model Volunteer {

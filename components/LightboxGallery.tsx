@@ -25,7 +25,7 @@ export default function LightboxGallery({ images }: Props) {
   const [primary, ...thumbnails] = images;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mt-2">
       {/* Primary Image */}
       <div
         onClick={() => {
