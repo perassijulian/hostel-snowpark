@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
 
 type Image = {
   src: string;
@@ -51,6 +56,14 @@ export default function LightboxGallery({ images }: Props) {
           />
         ))}
       </div>
+      {/* Lightbox */}
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        index={index}
+        slides={images}
+        plugins={[Thumbnails]}
+      />
     </div>
   );
 }
