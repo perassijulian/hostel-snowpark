@@ -1,5 +1,6 @@
 "use client";
 
+import { AccommodationCard } from "@/components/AccommodationCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Accommodation } from "@/types/accommodation";
 import Link from "next/link";
@@ -37,30 +38,9 @@ export default function AccommodationsPage() {
 
   return (
     <div className="grid m-4 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {accommodations.map((accom) => {
-        const primaryImage =
-          accom.pictures.find((p) => p.isPrimary) || accom.pictures[0];
-
-        return (
-          <Link
-            key={accom.id}
-            href={`/accommodation/${accom.id}`}
-            className="block bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow"
-            aria-label={`View details for ${accom.name}`}
-          >
-            <img
-              src={primaryImage?.url}
-              alt={primaryImage?.altText || accom.name}
-              className="w-full h-48 object-cover rounded-md mb-3"
-            />
-            <h2 className="text-lg font-bold text-gray-800">{accom.name}</h2>
-            <p className="text-gray-600 mt-1">{accom.description}</p>
-            <div className="mt-2 text-sm text-gray-500">
-              {accom.guests} guests · ${accom.price}/night
-            </div>
-          </Link>
-        );
-      })}
+      {accommodations.map((a) => (
+        <AccommodationCard key={a.id} accommodation={a} />
+      ))}
     </div>
   );
 }
