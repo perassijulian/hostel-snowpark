@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import AccommodationSummary from "@/components/AccommodationSummary";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id?: string }>;
   searchParams: {
     checkIn?: string;
     checkOut?: string;
@@ -12,10 +12,11 @@ type Props = {
 };
 
 export default async function BookingPage({ params, searchParams }: Props) {
-  const id = Number(params.id);
+  const { id: rawId } = await params;
+  const id = Number(rawId);
   if (isNaN(id)) return notFound();
 
-  const { checkIn, checkOut, guests } = searchParams;
+  const { checkIn, checkOut, guests } = await searchParams;
 
   // Ensure required query params are present
   if (!checkIn || !checkOut || !guests) {

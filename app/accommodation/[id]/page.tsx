@@ -6,11 +6,13 @@ import Button from "@/components/Button";
 import AccommodationSummary from "@/components/AccommodationSummary";
 
 type Props = {
-  params: { id?: string };
+  params: Promise<{ id?: string }>;
 };
 
 export default async function AccommodationPage({ params }: Props) {
-  const id = Number(params.id);
+  const { id: rawId } = await params;
+  const id = Number(rawId);
+  if (isNaN(id)) return notFound();
 
   if (isNaN(id)) return notFound();
 
