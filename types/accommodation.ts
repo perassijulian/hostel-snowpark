@@ -1,9 +1,10 @@
 export type PictureForm = {
+  id?: number;
+  accommodationId?: number | null;
   url: string;
   isPrimary: boolean;
-  caption?: string;
-  altText?: string;
-  id?: number;
+  caption?: string | null;
+  altText?: string | null;
 };
 
 export type Accommodation = {
