@@ -15,6 +15,13 @@ export default function BookingPage() {
   const checkOut = searchParams.get("checkOut");
   const guests = searchParams.get("guests");
 
+  // For AccommodationAvailable component
+  const queryParams = {
+    checkIn: checkIn || undefined,
+    checkOut: checkOut || undefined,
+    guests: guests || undefined,
+  };
+
   // Only fetch availability if all are defined
   const shouldFetchAvailability = checkIn && checkOut && guests && type;
 
@@ -163,7 +170,10 @@ export default function BookingPage() {
         error={error}
       />
 
-      <AccommodationAvailable available={accommodation} />
+      <AccommodationAvailable
+        queryParams={queryParams}
+        available={accommodation}
+      />
     </main>
   );
 }

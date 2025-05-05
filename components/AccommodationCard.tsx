@@ -3,16 +3,28 @@ import Link from "next/link";
 
 type Props = {
   accommodation: Accommodation;
+  queryParams?: {
+    checkIn?: string;
+    checkOut?: string;
+    guests?: string;
+  };
 };
 
-export function AccommodationCard({ accommodation }: Props) {
+export function AccommodationCard({ accommodation, queryParams }: Props) {
   const primaryImage =
     accommodation.pictures.find((p) => p.isPrimary) ||
     accommodation.pictures[0];
 
+  const href = queryParams
+    ? {
+        pathname: `/booking/${accommodation.id}`,
+        query: queryParams,
+      }
+    : `/accommodation/${accommodation.id}`;
+
   return (
     <Link
-      href={`/accommodation/${accommodation.id}`}
+      href={href}
       className="block bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow"
       aria-label={`View details for ${accommodation.name}`}
     >

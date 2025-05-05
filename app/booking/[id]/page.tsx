@@ -1,4 +1,3 @@
-// app/booking/[id]/page.tsx
 import { getAccommodationById } from "@/lib/db";
 import { notFound } from "next/navigation";
 import AccommodationSummary from "@/components/AccommodationSummary";
