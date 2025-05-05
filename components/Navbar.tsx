@@ -1,13 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { useBodyOverflow } from "@/contexts/BodyOverflowContext";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { setOverflow } = useBodyOverflow();
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  // Toggle menu and scroll lock
+  const toggleMenu = () => setIsOpen((prev) => !prev);
+
+  // Close menu & re-enable scroll on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  // Sync scroll lock with menu state
+  useEffect(() => {
+    setOverflow(isOpen);
+  }, [isOpen, setOverflow]);
+
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/volunteer", label: "Volunteer" },
+    { href: "/booking", label: "Booking" },
+    { href: "/contact", label: "Contact" },
+  ];
 
   return (
     <nav className="bg-white shadow-md p-4 sticky top-0 z-50">
@@ -18,74 +41,38 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <ul className="hidden md:flex space-x-6 text-gray-600 font-medium">
-          <Link href="/" className="hover:text-black cursor-pointer">
-            Home
-          </Link>
-          <Link href="/volunteer" className="hover:text-black cursor-pointer">
-            Volunteer
-          </Link>
-          <Link href="/booking" className="hover:text-black cursor-pointer">
-            Booking
-          </Link>
-          <Link href="/contact" className="hover:text-black cursor-pointer">
-            Contact
-          </Link>
+          {navLinks.map((link) => (
+            <li key={link.href}>
+              <Link href={link.href} className="hover:text-black">
+                {link.label}
+              </Link>
+            </li>
+          ))}
         </ul>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden" onClick={toggleMenu}>
+        <button
+          className="md:hidden"
+          onClick={toggleMenu}
+          aria-label={isOpen ? "Close menu" : "Open menu"}
+        >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Links */}
       {isOpen && (
-        <ul className="md:hidden mt-4 space-x-4 flex justify-center text-gray-600 font-medium text-center">
-          <li>
-            <Link
-              href="/"
-              onClick={() => {
-                setIsOpen(false);
-              }}
-              className="hover:text-black cursor-pointer"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/volunteer"
-              onClick={() => {
-                setIsOpen(false);
-              }}
-              className="hover:text-black cursor-pointer"
-            >
-              Volunteer
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/booking"
-              onClick={() => {
-                setIsOpen(false);
-              }}
-              className="hover:text-black cursor-pointer"
-            >
-              Booking
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/contact"
-              onClick={() => {
-                setIsOpen(false);
-              }}
-              className="hover:text-black cursor-pointer"
-            >
-              Contact
-            </Link>
-          </li>
-        </ul>
+        <div className="absolute top-full left-0 w-full bg-white shadow-md z-50 md:hidden">
+          <ul className="flex flex-col items-center space-y-4 py-4 text-gray-600 font-medium text-center">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-black">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </nav>
   );
