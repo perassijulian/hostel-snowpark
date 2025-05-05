@@ -27,9 +27,6 @@ export default function BookingPage() {
     checkOut: "",
     guests: 1,
     type: "dorm",
-    name: "",
-    email: "",
-    phone: "",
   });
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
@@ -50,15 +47,17 @@ export default function BookingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     setStatus("submitting");
 
-    const { checkIn, checkOut, guests, type, name, email, phone } = formData;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const { checkIn, checkOut, guests, type } = formData;
 
+    /**
+     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Make sure email is correctly formatted
     if (!emailRegex.test(email)) {
       setErrorMessage("Invalid email format");
       setStatus("error");
       return;
     }
+     */
 
     // Convert check-in and check-out to Date objects before sending them to the backend
     const startDate = new Date(checkIn);
@@ -84,7 +83,8 @@ export default function BookingPage() {
       setStatus("error");
       return;
     }
-
+    /**
+ * 
     // Make sure name is not empty
     if (name === "") {
       setErrorMessage("Name should not be empty");
@@ -99,11 +99,9 @@ export default function BookingPage() {
       setStatus("error");
       return;
     }
+ */
 
     const bookingData = {
-      name,
-      email,
-      phone,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       guests,
@@ -114,6 +112,7 @@ export default function BookingPage() {
       router.push(
         `/booking?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&type=${type}`
       );
+      setStatus("success");
 
       {
         /* Booking logic
@@ -155,13 +154,13 @@ export default function BookingPage() {
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
       <BookingForm
         onSubmit={handleSubmit}
+        onChange={handleChange}
         formData={formData}
         status={status}
         errorMessage={errorMessage}
         availability={availability}
         loading={loading}
         error={error}
-        onChange={handleChange}
       />
 
       <AccommodationAvailable available={accommodation} />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
+import Button from "./Button";
 
 interface BookingFormProps {
   onSubmit: (formData: any) => void;
@@ -27,7 +28,7 @@ export default function BookingForm({
   error,
   onChange,
 }: BookingFormProps) {
-  const { checkIn, checkOut, guests, type, name, email, phone } = formData;
+  const { checkIn, checkOut, guests, type } = formData;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,32 +84,6 @@ export default function BookingForm({
         ]}
       />
 
-      <InputField
-        label="Full Name"
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={onChange}
-        required
-      />
-
-      <InputField
-        label="Email"
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={onChange}
-        required
-      />
-      <InputField
-        label="Phone"
-        type="tel"
-        name="phone"
-        value={formData.phone}
-        onChange={onChange}
-        required
-      />
-
       {/* Show availability or loading state */}
       {loading && <p>Checking availability...</p>}
       {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
@@ -123,17 +98,10 @@ export default function BookingForm({
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={status === "submitting"}
-        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition"
-      >
-        {status === "submitting" ? "Submitting..." : "Book Now"}
-      </button>
+      <Button className="mt-4" type="submit" disabled={status === "submitting"}>
+        {status === "submitting" ? "Checking..." : "Check availability"}{" "}
+      </Button>
 
-      {status === "success" && (
-        <p className="text-green-600 mt-2">Booking submitted successfully!</p>
-      )}
       {status === "error" && (
         <p className="text-red-600 mt-2">{errorMessage}</p>
       )}
