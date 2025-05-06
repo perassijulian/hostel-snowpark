@@ -1,109 +1,128 @@
-import { useState } from "react";
-import InputField from "@/components/InputField";
-import SelectField from "@/components/SelectField";
-import Button from "./Button";
+"use client";
 
-interface BookingFormProps {
-  onSubmit: (formData: any) => void;
-  formData: any;
-  status: "idle" | "submitting" | "success" | "error";
-  errorMessage: string | null;
-  availability: any; // Pass availability data here
-  loading: boolean;
-  error: string | null;
-  onChange: (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => void;
-}
+import { useState } from "react";
+import InputField from "./InputField";
+
+type Props = {
+  accommodation: any;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+};
 
 export default function BookingForm({
-  onSubmit,
-  formData,
-  status,
-  errorMessage,
-  availability,
-  loading,
-  error,
-  onChange,
-}: BookingFormProps) {
-  const { checkIn, checkOut, guests, type } = formData;
+  accommodation,
+  checkIn,
+  checkOut,
+  guests,
+}: Props) {
+  const [formData, setFormData] = useState({
+    checkIn,
+    checkOut,
+    guests,
+    name: "",
+    email: "",
+    phone: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    setStatus("submitting");
+    setErrorMessage(null);
+
+    const res = await fetch("/api/booking", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      setStatus("error");
+      setErrorMessage(result.error);
+      return;
+    }
+
+    setStatus("success");
+    setFormData({ checkIn, checkOut, guests, name: "", email: "", phone: "" });
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={`grid gap-4 duration-200 ${
-        status === "submitting" ? "opacity-50 pointer-events-none" : ""
-      }`}
-    >
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <InputField
-          label="Check-In"
-          type="date"
           name="checkIn"
           value={formData.checkIn}
-          onChange={onChange}
-          required
-        />
-
-        <InputField
-          label="Check-Out"
+          onChange={handleChange}
+          label="Check-In"
           type="date"
+          readOnly
+          className="cursor-not-allowed"
+        />
+        <InputField
           name="checkOut"
           value={formData.checkOut}
-          onChange={onChange}
-          required
+          onChange={handleChange}
+          label="Check-Out"
+          type="date"
+          readOnly
+          className="cursor-not-allowed"
+        />
+        <InputField
+          name="guests"
+          value={formData.guests}
+          onChange={handleChange}
+          label="Guests"
+          type="number"
+          className="cursor-not-allowed"
+          readOnly
         />
       </div>
-
       <InputField
-        label="Guests"
-        type="number"
-        name="guests"
-        min="1"
-        value={formData.guests}
-        onChange={onChange}
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        label="Name"
+        type="text"
         required
       />
-
-      <SelectField
-        label="Accomodation Type"
-        name="type"
-        value={formData.type}
-        onChange={onChange}
-        options={[
-          { value: "dorm", label: "Dorm" },
-          { value: "cabin", label: "Cabin" },
-          { value: "private", label: "Private Room" },
-        ]}
+      <InputField
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        label="Email"
+        type="text"
+        required
       />
-
-      {/* Show availability or loading state */}
-      {loading && <p>Checking availability...</p>}
-      {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
-      {availability && (
-        <div>
-          <h3>Available Rooms:</h3>
-          <ul>
-            {availability.map((room: any) => (
-              <li key={room.id}>{room.name}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <Button className="mt-4" type="submit" disabled={status === "submitting"}>
-        {status === "submitting" ? "Checking..." : "Check availability"}{" "}
-      </Button>
-
-      {status === "error" && (
-        <p className="text-red-600 mt-2">{errorMessage}</p>
+      <InputField
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+        label="Phone"
+        type="text"
+        required
+      />
+      <button type="submit" disabled={status === "submitting"}>
+        {status === "submitting" ? "Submitting..." : "Confirm Booking"}
+      </button>
+      {status === "error" && <p className="text-red-600">{errorMessage}</p>}
+      {status === "success" && (
+        <p className="text-green-600">Booking successful!</p>
       )}
     </form>
   );

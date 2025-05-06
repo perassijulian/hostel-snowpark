@@ -12,6 +12,8 @@ interface InputFieldProps {
   ) => void;
   required?: boolean;
   min?: string;
+  readOnly?: boolean;
+  className?: string;
 }
 
 export default function InputField({
@@ -22,6 +24,8 @@ export default function InputField({
   onChange,
   required = false,
   min,
+  readOnly = false,
+  className = "",
 }: InputFieldProps) {
   return (
     <div>
@@ -31,9 +35,10 @@ export default function InputField({
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full border px-3 py-2 rounded"
+        className={`w-full border px-3 py-2 rounded ${className}`}
         required={required}
         min={min}
+        readOnly={readOnly}
       />
     </div>
   );

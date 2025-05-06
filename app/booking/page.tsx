@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import BookingForm from "@/components/BookingForm";
+import AvailabilityForm from "@/components/AvailabilityForm";
 import { useAvailability } from "@/hooks/useAvailability";
 import AccommodationAvailable from "@/components/AccommodationAvailable";
 
@@ -120,37 +120,6 @@ export default function BookingPage() {
         `/booking?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&type=${type}`
       );
       setStatus("success");
-
-      {
-        /* Booking logic
-      const res = await fetch("/api/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingData),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        setErrorMessage(result.error);
-      }
-
-      if (res.ok) {
-        setStatus("success");
-        setFormData({
-          checkIn: "",
-          checkOut: "",
-          guests: 1,
-          type: "dorm",
-          name: "",
-          email: "",
-          phone: "",
-        });
-      } else {
-        throw new Error("Failed to submit");
-      }
-      */
-      }
     } catch (err) {
       setStatus("error");
     }
@@ -159,7 +128,7 @@ export default function BookingPage() {
   return (
     <main className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
-      <BookingForm
+      <AvailabilityForm
         onSubmit={handleSubmit}
         onChange={handleChange}
         formData={formData}

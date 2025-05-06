@@ -1,6 +1,7 @@
 import { getAccommodationById } from "@/lib/db";
 import { notFound } from "next/navigation";
 import AccommodationSummary from "@/components/AccommodationSummary";
+import BookingForm from "@/components/BookingForm";
 
 type Props = {
   params: Promise<{ id?: string }>;
@@ -35,6 +36,12 @@ export default async function BookingPage({ params, searchParams }: Props) {
       <h1 className="text-3xl font-bold text-gray-800">Review Your Booking</h1>
 
       <AccommodationSummary accommodation={accommodation} />
+      <BookingForm
+        accommodation={accommodation}
+        checkIn={checkIn}
+        checkOut={checkOut}
+        guests={Number(guests)}
+      />
     </div>
   );
 }
