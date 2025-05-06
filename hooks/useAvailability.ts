@@ -28,7 +28,7 @@ export function useAvailability(params: AvailabilityParams) {
         if (!res.ok) throw new Error("Error checking availability.");
 
         const data = await res.json();
-        setAvailability(data.lenghth > 0);
+        setAvailability(data.length > 0);
         setAccommodation(data);
       } catch (err) {
         setError(

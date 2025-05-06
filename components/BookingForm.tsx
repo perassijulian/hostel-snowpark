@@ -46,6 +46,30 @@ export default function BookingForm({
     setStatus("submitting");
     setErrorMessage(null);
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Make sure email is correctly formatted
+    if (!emailRegex.test(formData.email)) {
+      setErrorMessage("Invalid email format");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure name is not empty
+    if (formData.name === "") {
+      setErrorMessage("Name should not be empty");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure phone is not empty
+    // TODO: check phone number length
+    if (formData.phone === "") {
+      setErrorMessage("Phone should not be empty");
+      setStatus("error");
+      return;
+    }
+
     const res = await fetch("/api/booking", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

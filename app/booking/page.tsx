@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AvailabilityForm from "@/components/AvailabilityForm";
 import { useAvailability } from "@/hooks/useAvailability";
 import AccommodationAvailable from "@/components/AccommodationAvailable";
+import { useEffect, useRef, useState } from "react";
 
 export default function BookingPage() {
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const prevLoading = useRef<boolean>(false);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -23,126 +28,88 @@ export default function BookingPage() {
   };
 
   // Only fetch availability if all are defined
-  const shouldFetchAvailability = checkIn && checkOut && guests && type;
-
-  const { accommodation, availability, loading, error } = useAvailability(
-    shouldFetchAvailability ? { checkIn, checkOut, guests, type } : null
+  const shouldFetchAvailability = Boolean(
+    checkIn && checkOut && guests && type
   );
 
-  const [formData, setFormData] = useState({
-    checkIn: "",
-    checkOut: "",
-    guests: 1,
-    type: "dorm",
-  });
-  const [status, setStatus] = useState<
-    "idle" | "submitting" | "success" | "error"
-  >("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { accommodation, availability, loading, error } = useAvailability(
+    shouldFetchAvailability
+      ? {
+          checkIn: checkIn as string,
+          checkOut: checkOut as string,
+          guests: guests as string,
+          type: type as string,
+        }
+      : null
+  );
+  console.log("availability", availability);
+  console.log("accommodation", accommodation);
+  console.log("loading", loading);
 
-  const isAvailable = availability && !loading && !error;
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    setStatus("submitting");
-
-    const { checkIn, checkOut, guests, type } = formData;
-
-    /**
-     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Make sure email is correctly formatted
-    if (!emailRegex.test(email)) {
-      setErrorMessage("Invalid email format");
-      setStatus("error");
-      return;
-    }
-     */
-
-    // Convert check-in and check-out to Date objects before sending them to the backend
-    const startDate = new Date(checkIn);
-    const endDate = new Date(checkOut);
-
-    // Make sure the dates are valid
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      setErrorMessage("Invalid dates");
-      setStatus("error");
-      return;
+  useEffect(() => {
+    if (!prevLoading.current && loading) {
+      // New request started
+      setStatus("submitting");
     }
 
-    // Make sure the dates are secuential
-    if (startDate >= endDate) {
-      setErrorMessage("End date is before or same as start date");
-      setStatus("error");
-      return;
-    }
-
-    // Make sure guests is a positive number
-    if (guests < 1) {
-      setErrorMessage("Guests should be a positive integer");
-      setStatus("error");
-      return;
-    }
-    /**
- * 
-    // Make sure name is not empty
-    if (name === "") {
-      setErrorMessage("Name should not be empty");
-      setStatus("error");
-      return;
-    }
-
-    // Make sure phone is not empty
-    // TODO: check phone number length
-    if (phone === "") {
-      setErrorMessage("Phone should not be empty");
-      setStatus("error");
-      return;
-    }
- */
-
-    const bookingData = {
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      guests,
-      type,
-    };
-
-    try {
-      router.push(
-        `/booking?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&type=${type}`
-      );
+    if (prevLoading.current && !loading) {
+      // Request just finished
       setStatus("success");
-    } catch (err) {
-      setStatus("error");
     }
+
+    prevLoading.current = loading;
+  }, [loading]);
+
+  const handleFormSubmit = ({
+    checkIn,
+    checkOut,
+    guests,
+    type,
+  }: {
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+    type: string;
+  }) => {
+    setStatus("submitting");
+    const params = new URLSearchParams({
+      checkIn,
+      checkOut,
+      guests: guests.toString(),
+      type,
+    });
+
+    router.push(`/booking?${params}`);
   };
 
   return (
     <main className="max-w-xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
       <AvailabilityForm
-        onSubmit={handleSubmit}
-        onChange={handleChange}
-        formData={formData}
+        setStatus={setStatus}
         status={status}
-        errorMessage={errorMessage}
-        availability={availability}
-        loading={loading}
+        onSubmit={handleFormSubmit}
         error={error}
       />
-
-      <AccommodationAvailable
-        queryParams={queryParams}
-        available={accommodation}
-      />
+      {status === "success" && !availability && !loading ? (
+        <div className="mt-6 p-4 rounded-2xl bg-yellow-50 border border-yellow-200 flex items-start gap-3">
+          <div className="text-sm text-yellow-800">
+            <p className="font-medium mb-1">No availability</p>
+            <p>
+              Sorry, we don't have any{" "}
+              <span className="font-semibold">{type}</span> available from{" "}
+              <span className="font-semibold">{checkIn}</span> to{" "}
+              <span className="font-semibold">{checkOut}</span>. Try adjusting
+              your dates or guest count.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <AccommodationAvailable
+          queryParams={queryParams}
+          available={accommodation}
+        />
+      )}
     </main>
   );
 }

@@ -1,37 +1,86 @@
+"use client";
+
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import Button from "./Button";
+import { useState } from "react";
 
 interface AvailabilityProps {
-  onSubmit: (formData: any) => void;
-  formData: any;
+  onSubmit: (formData: {
+    checkIn: string;
+    checkOut: string;
+    guests: number;
+    type: string;
+  }) => void;
   status: "idle" | "submitting" | "success" | "error";
-  errorMessage: string | null;
-  availability: any; // Pass availability data here
-  loading: boolean;
-  error: string | null;
-  onChange: (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => void;
+  setStatus: (status: "idle" | "submitting" | "success" | "error") => void;
+  error?: string | null;
 }
 
 export default function AvailabilityForm({
   onSubmit,
-  formData,
   status,
-  errorMessage,
-  availability,
-  loading,
-  error,
-  onChange,
+  setStatus,
+  error = null,
 }: AvailabilityProps) {
-  const { checkIn, checkOut, guests, type } = formData;
+  const [formData, setFormData] = useState({
+    checkIn: "",
+    checkOut: "",
+    guests: 1,
+    type: "dorm",
+  });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "guests" ? parseInt(value) : value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(formData);
+    setStatus("submitting");
+    setErrorMessage(null);
+
+    const { checkIn, checkOut, guests, type } = formData;
+
+    // Convert check-in and check-out to Date objects before sending them to the backend
+    const startDate = new Date(checkIn);
+    const endDate = new Date(checkOut);
+
+    // Make sure the dates are valid
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      setErrorMessage("Invalid dates");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure the dates are secuential
+    if (startDate >= endDate) {
+      setErrorMessage("End date is before or same as start date");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure guests is a positive number
+    if (guests < 1) {
+      setErrorMessage("Guests should be a positive integer");
+      setStatus("error");
+      return;
+    }
+
+    try {
+      onSubmit(formData);
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage("An error occurred while booking");
+    }
   };
 
   return (
@@ -47,7 +96,7 @@ export default function AvailabilityForm({
           type="date"
           name="checkIn"
           value={formData.checkIn}
-          onChange={onChange}
+          onChange={handleChange}
           required
         />
 
@@ -56,7 +105,7 @@ export default function AvailabilityForm({
           type="date"
           name="checkOut"
           value={formData.checkOut}
-          onChange={onChange}
+          onChange={handleChange}
           required
         />
       </div>
@@ -67,7 +116,7 @@ export default function AvailabilityForm({
         name="guests"
         min="1"
         value={formData.guests}
-        onChange={onChange}
+        onChange={handleChange}
         required
       />
 
@@ -75,7 +124,7 @@ export default function AvailabilityForm({
         label="Accomodation Type"
         name="type"
         value={formData.type}
-        onChange={onChange}
+        onChange={handleChange}
         options={[
           { value: "dorm", label: "Dorm" },
           { value: "cabin", label: "Cabin" },
@@ -85,8 +134,8 @@ export default function AvailabilityForm({
 
       {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
 
-      <Button className="mt-4" type="submit" disabled={loading}>
-        {status === "submitting" ? "Checking..." : "Check availability"}{" "}
+      <Button className="mt-4" type="submit" disabled={status === "submitting"}>
+        {status === "submitting" ? "Checking..." : "Check availability"}
       </Button>
 
       {status === "error" && (
