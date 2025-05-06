@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import InputField from "./InputField";
+import Button from "./Button";
 
 type Props = {
   accommodation: any;
@@ -23,6 +24,7 @@ export default function BookingForm({
     name: "",
     email: "",
     phone: "",
+    accommodationId: accommodation.id,
   });
 
   const [status, setStatus] = useState<
@@ -59,7 +61,15 @@ export default function BookingForm({
     }
 
     setStatus("success");
-    setFormData({ checkIn, checkOut, guests, name: "", email: "", phone: "" });
+    setFormData({
+      checkIn,
+      checkOut,
+      guests,
+      name: "",
+      email: "",
+      phone: "",
+      accommodationId: accommodation.id,
+    });
   };
 
   return (
@@ -117,9 +127,9 @@ export default function BookingForm({
         type="text"
         required
       />
-      <button type="submit" disabled={status === "submitting"}>
+      <Button type="submit" disabled={status === "submitting"}>
         {status === "submitting" ? "Submitting..." : "Confirm Booking"}
-      </button>
+      </Button>
       {status === "error" && <p className="text-red-600">{errorMessage}</p>}
       {status === "success" && (
         <p className="text-green-600">Booking successful!</p>

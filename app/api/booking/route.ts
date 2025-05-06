@@ -4,8 +4,9 @@ import { NextResponse, NextRequest } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log("Booking body:", body);
     const guests = Number(body.guests);
-    const { name, email, phone, startDate, endDate, type } = body;
+    const { name, email, phone, startDate, endDate, accommodationId } = body;
 
     // 🔐 Validate fields
     if (
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
       !startDate ||
       !endDate ||
       !guests ||
-      !type
+      !accommodationId
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
     console.log("checking for overlap");
     const clash = await prisma.booking.findFirst({
       where: {
-        type,
+        accommodationId,
         OR: [
           {
             startDate: { lte: end },
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
         startDate: start,
         endDate: end,
         guests,
-        type,
+        accommodationId,
       },
     });
 
