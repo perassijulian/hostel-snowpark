@@ -4,9 +4,15 @@ import { NextResponse, NextRequest } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log("Booking body:", body);
     const guests = Number(body.guests);
-    const { name, email, phone, startDate, endDate, accommodationId } = body;
+    const {
+      name,
+      email,
+      phone,
+      checkIn: startDate,
+      checkOut: endDate,
+      accommodationId,
+    } = body;
 
     // 🔐 Validate fields
     if (
