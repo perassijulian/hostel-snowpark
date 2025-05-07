@@ -1,13 +1,25 @@
 import { prisma } from "@/lib/prisma";
+import { BookingType } from "@/types/booking";
 import { format } from "date-fns";
 import { label } from "yet-another-react-lightbox";
 
 export const dynamic = "force-dynamic"; // make sure it always fetches fresh data
 
 export default async function AdminBookings() {
-  const bookings = await prisma.booking.findMany({
-    orderBy: { startDate: "asc" },
-  });
+  let bookings: BookingType[] = [];
+  let error = null;
+
+  try {
+    bookings = await prisma.booking.findMany({
+      orderBy: { startDate: "asc" },
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    error = "Failed to load bookings. Please try again.";
+    bookings = [];
+  }
+
+  console.log("Bookings:", bookings);
 
   const getStatus = (startDate: Date, endDate: Date) => {
     const today = new Date();
@@ -22,7 +34,11 @@ export default async function AdminBookings() {
     <main className="p-6 max-w-4xl mx-auto h-full overflow-auto">
       <h1 className="text-3xl font-bold mb-6">All Bookings</h1>
 
-      {bookings.length === 0 ? (
+      {error ? (
+        <p className="text-red-600 bg-red-100 border border-red-200 p-4 rounded-lg shadow-sm">
+          {error}
+        </p>
+      ) : bookings.length === 0 ? (
         <p className="text-gray-600">No bookings yet.</p>
       ) : (
         <div className="overflow-x-auto">
