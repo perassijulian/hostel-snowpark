@@ -100,7 +100,7 @@ export default function BookingPage() {
               <span className="font-semibold">{type}</span> available from{" "}
               <span className="font-semibold">{checkIn}</span> to{" "}
               <span className="font-semibold">{checkOut}</span>. Try adjusting
-              your dates or guest count.
+              your dates or accommodation type.
             </p>
           </div>
         </div>
