@@ -1,11 +1,5 @@
-export type BookingType = {
-  accommodationId: number;
-  createdAt: Date;
-  email: string;
-  endDate: Date;
-  guests: number;
-  id: number;
-  name: string;
-  phone: string;
-  startDate: Date;
+import type { Booking, Accommodation } from "@prisma/client";
+
+export type BookingType = Booking & {
+  accommodation: Accommodation;
 };

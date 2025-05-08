@@ -1,16 +1,44 @@
+import { AdminBookingFilters } from "@/components/AdminBookingsFilter";
 import { prisma } from "@/lib/prisma";
 import { BookingType } from "@/types/booking";
 import { format } from "date-fns";
-import { label } from "yet-another-react-lightbox";
+
+type Props = {
+  searchParams: {
+    search?: string;
+    type?: string;
+    status?: string;
+  };
+};
 
 export const dynamic = "force-dynamic"; // make sure it always fetches fresh data
 
-export default async function AdminBookings() {
+export default async function AdminBookings({ searchParams }: Props) {
+  const search = searchParams.search || "";
+  const type = searchParams.type || "";
+  const status = searchParams.status || "";
+
   let bookings: BookingType[] = [];
   let error = null;
 
   try {
     bookings = await prisma.booking.findMany({
+      where: {
+        AND: [
+          search
+            ? {
+                OR: [
+                  { name: { contains: search, mode: "insensitive" } },
+                  { email: { contains: search, mode: "insensitive" } },
+                ],
+              }
+            : {},
+          type ? { accommodation: { type: type } } : {},
+        ],
+      },
+      include: {
+        accommodation: true,
+      },
       orderBy: { startDate: "asc" },
     });
   } catch (error) {
@@ -19,7 +47,14 @@ export default async function AdminBookings() {
     bookings = [];
   }
 
-  console.log("Bookings:", bookings);
+  bookings = bookings.filter((b) => {
+    const matchesSearch =
+      b.name.toLowerCase().includes(search.toLowerCase()) ||
+      b.email.toLowerCase().includes(search.toLowerCase());
+    const matchesType = type ? b.accommodation.type === type : true;
+    const matchesStatus = true; // Placeholder for status filtering
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   const getStatus = (startDate: Date, endDate: Date) => {
     const today = new Date();
@@ -33,6 +68,8 @@ export default async function AdminBookings() {
   return (
     <main className="p-6 max-w-4xl mx-auto h-full overflow-auto">
       <h1 className="text-3xl font-bold mb-6">All Bookings</h1>
+
+      <AdminBookingFilters />
 
       {error ? (
         <p className="text-red-600 bg-red-100 border border-red-200 p-4 rounded-lg shadow-sm">
@@ -58,7 +95,9 @@ export default async function AdminBookings() {
                 return (
                   <tr key={b.id} className="border-b hover:bg-gray-50">
                     <td className="py-2 pr-4">{b.name}</td>
-                    <td className="py-2 pr-4 capitalize">{b.type}</td>
+                    <td className="py-2 pr-4 capitalize">
+                      {b.accommodation.type}
+                    </td>
                     <td className="py-2 pr-4">
                       {format(new Date(b.startDate), "dd MMM yyyy")}
                     </td>
