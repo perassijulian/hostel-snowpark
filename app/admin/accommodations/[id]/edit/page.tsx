@@ -4,20 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import InputField from "@/components/InputField";
 import TextAreaField from "@/components/TextAreaField";
-
-type Accommodation = {
-  id: string;
-  name: string;
-  type: string;
-  price: number;
-  description: string;
-  guests: number;
-};
+import { AccommodationType } from "@prisma/client";
+import type { Accommodation } from "@prisma/client";
+import SelectField from "@/components/SelectField";
 
 export default function EditAccommodationPage() {
   const router = useRouter();
   const { id } = useParams();
   const [formData, setFormData] = useState<Accommodation | null>(null);
+
+  const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
 
   // Fetch accommodation data
   useEffect(() => {
@@ -81,12 +77,15 @@ export default function EditAccommodationPage() {
           onChange={handleChange}
           required
         />
-        <InputField
-          label="Type"
+        <SelectField
+          label="Accomodation Type"
           name="type"
           value={formData.type}
           onChange={handleChange}
-          required
+          options={typeOptions.map((type) => ({
+            value: type,
+            label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+          }))}
         />
         <InputField
           label="Price per Night"

@@ -4,6 +4,7 @@ import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import Button from "./Button";
 import { useState } from "react";
+import { AccommodationType } from "@prisma/client";
 
 interface AvailabilityProps {
   onSubmit: (formData: {
@@ -27,9 +28,10 @@ export default function AvailabilityForm({
     checkIn: "",
     checkOut: "",
     guests: 1,
-    type: "dorm",
+    type: "DORM",
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -71,6 +73,13 @@ export default function AvailabilityForm({
     // Make sure guests is a positive number
     if (guests < 1) {
       setErrorMessage("Guests should be a positive integer");
+      setStatus("error");
+      return;
+    }
+
+    // Make sure type is a valid accommodation type
+    if (!typeOptions.includes(type as AccommodationType)) {
+      setErrorMessage("Invalid accommodation type");
       setStatus("error");
       return;
     }
@@ -125,11 +134,10 @@ export default function AvailabilityForm({
         name="type"
         value={formData.type}
         onChange={handleChange}
-        options={[
-          { value: "dorm", label: "Dorm" },
-          { value: "cabin", label: "Cabin" },
-          { value: "private", label: "Private Room" },
-        ]}
+        options={typeOptions.map((type) => ({
+          value: type,
+          label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+        }))}
       />
 
       {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}

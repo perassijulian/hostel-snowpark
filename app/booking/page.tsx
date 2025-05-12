@@ -42,9 +42,6 @@ export default function BookingPage() {
         }
       : null
   );
-  console.log("availability", availability);
-  console.log("accommodation", accommodation);
-  console.log("loading", loading);
 
   useEffect(() => {
     if (!prevLoading.current && loading) {

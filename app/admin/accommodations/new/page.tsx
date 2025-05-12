@@ -7,6 +7,8 @@ import TextAreaField from "@/components/TextAreaField";
 import { UploadButton } from "@/utils/uploadthing";
 import Link from "next/link";
 import { PictureForm } from "@/types/accommodation";
+import { AccommodationType } from "@prisma/client";
+import SelectField from "@/components/SelectField";
 
 export default function NewAccommodationPage() {
   const router = useRouter();
@@ -24,6 +26,8 @@ export default function NewAccommodationPage() {
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -106,12 +110,15 @@ export default function NewAccommodationPage() {
           required
         />
 
-        <InputField
-          label="Type"
+        <SelectField
+          label="Accomodation Type"
           name="type"
           value={formData.type}
           onChange={handleChange}
-          required
+          options={typeOptions.map((type) => ({
+            value: type,
+            label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+          }))}
         />
 
         <InputField
