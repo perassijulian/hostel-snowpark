@@ -4,16 +4,17 @@ import { BookingType } from "@/types/booking";
 import { format } from "date-fns";
 
 type Props = {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     type?: string;
     status?: string;
-  };
+  }>;
 };
 
 export const dynamic = "force-dynamic"; // make sure it always fetches fresh data
 
-export default async function AdminBookings({ searchParams }: Props) {
+export default async function AdminBookings(props: Props) {
+  const searchParams = await props.searchParams;
   const search = searchParams.search || "";
   const type = searchParams.type || "";
   const status = searchParams.status || "";

@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AccommodationType {
+  DORM
+  PRIVATE
+  SUITE
+  CABIN
+  TENT
+  OTHER
+}
+
 model Booking {
   id        Int      @id @default(autoincrement())
   name      String
@@ -34,7 +43,7 @@ model Accommodation {
   id          Int       @id @default(autoincrement())
   name        String
   description String
-  type        String // Example: "dorm", "private", "suite"
+  type        AccommodationType
   price       Float
   guests      Int
   pictures    Picture[] @relation("AccommodationPictures")
