@@ -1,12 +1,13 @@
 import { AdminBookingFilters } from "@/components/AdminBookingsFilter";
 import { prisma } from "@/lib/prisma";
 import { BookingType } from "@/types/booking";
+import { AccommodationType } from "@prisma/client";
 import { format } from "date-fns";
 
 type Props = {
   searchParams: Promise<{
     search?: string;
-    type?: string;
+    type?: AccommodationType;
     status?: string;
   }>;
 };

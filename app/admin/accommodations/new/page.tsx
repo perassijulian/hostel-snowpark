@@ -74,6 +74,13 @@ export default function NewAccommodationPage() {
         return;
       }
 
+      // Check if the type is valid
+      if (!typeOptions.includes(formData.type as AccommodationType)) {
+        setStatus("error");
+        setErrorMessage("Invalid accommodation type.");
+        return;
+      }
+
       // Submit form data to the server
       const res = await fetch("/api/admin/accommodations", {
         method: "POST",

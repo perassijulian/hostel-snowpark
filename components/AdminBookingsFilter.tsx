@@ -1,9 +1,12 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import SelectField from "./SelectField";
+import { AccommodationType } from "@prisma/client";
 
 export function AdminBookingFilters() {
   const searchParams = useSearchParams();
+  const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
 
   return (
     <form className="flex flex-wrap gap-4 mb-6" method="GET">
@@ -14,15 +17,18 @@ export function AdminBookingFilters() {
         className="border rounded px-3 py-2 w-48"
         defaultValue={searchParams.get("search") || ""}
       />
-      <select
+      <SelectField
+        label="Type"
         name="type"
-        className="border rounded px-3 py-2"
         defaultValue={searchParams.get("type") || ""}
-      >
-        <option value="">All types</option>
-        <option value="private">Private</option>
-        <option value="shared">Shared</option>
-      </select>
+        options={[
+          { value: "", label: "All" },
+          ...typeOptions.map((type) => ({
+            value: type,
+            label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+          })),
+        ]}
+      />
       <select
         name="status"
         className="border rounded px-3 py-2"
