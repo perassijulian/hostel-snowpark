@@ -82,7 +82,7 @@ export default async function AdminBookings(props: Props) {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
+            <thead className="bg-gray-100 border-b text-sm uppercase text-gray-600">
               <tr className="border-b">
                 <th className="py-2 pr-4">Guest</th>
                 <th className="py-2 pr-4">Type</th>

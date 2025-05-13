@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Button from "@/components/Button";
+import { FolderPlus, PlusSquareIcon, Settings, Trash2 } from "lucide-react";
 
 type Accommodation = {
   id: string;
@@ -51,19 +53,19 @@ export default function AdminAccommodations() {
           href="/admin/accommodations/new"
           className="bg-green-800 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
         >
-          New +
+          <FolderPlus />
         </Link>
       </div>
 
       {accommodations.length === 0 ? (
-        <div className="text-center text-gray-500 py-20 border rounded-md shadow-inner">
+        <div className="text-center text-gray-500 py-20">
           {status === "loading" ? "Loading.." : "No accommodations yet."}
         </div>
       ) : (
-        <div className="overflow-x-auto border rounded-md shadow-sm">
-          <table className="min-w-full text-left">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead className="bg-gray-100 border-b text-sm uppercase text-gray-600">
-              <tr>
+              <tr className="border-b">
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">Price</th>
@@ -81,21 +83,20 @@ export default function AdminAccommodations() {
                   <td className="px-4 py-3">{acc.type}</td>
                   <td className="px-4 py-3">${acc.price}/night</td>
                   <td className="px-4 py-3">{acc.guests}</td>
-                  <td className="px-4 py-3 text-right space-x-2">
-                    <button
+                  <td className="px-4 py-2 text-right space-x-2">
+                    <Button
                       onClick={() =>
                         router.push(`/admin/accommodations/${acc.id}/edit`)
                       }
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
-                      Edit
-                    </button>
-                    <button
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                    <Button
                       onClick={() => handleDelete(acc.id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                      className="bg-red-600 hover:bg-red-700"
                     >
-                      Delete
-                    </button>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </td>
                 </tr>
               ))}
