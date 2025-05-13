@@ -18,7 +18,7 @@ export default function Button({
       disabled={disabled}
       type={type}
       onClick={onClick}
-      className={`cursor-pointer px-8 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ${className}`}
+      className={`px-6 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl shadow hover:bg-blue-700 hover:shadow-lg transition duration-300 ${className}`}
     >
       {children}
     </button>

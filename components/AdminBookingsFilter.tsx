@@ -3,20 +3,25 @@
 import { useSearchParams } from "next/navigation";
 import SelectField from "./SelectField";
 import { AccommodationType } from "@prisma/client";
+import InputField from "./InputField";
+import Button from "./Button";
 
 export function AdminBookingFilters() {
   const searchParams = useSearchParams();
   const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
 
   return (
-    <form className="flex flex-wrap gap-4 mb-6" method="GET">
-      <input
+    <form
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 p-4 bg-white rounded-xl shadow"
+      method="GET"
+    >
+      <InputField
         type="search"
         name="search"
-        placeholder="Search guest"
-        className="border rounded px-3 py-2 w-48"
+        label="Search"
         defaultValue={searchParams.get("search") || ""}
       />
+
       <SelectField
         label="Type"
         name="type"
@@ -29,22 +34,18 @@ export function AdminBookingFilters() {
           })),
         ]}
       />
-      <select
+      <SelectField
+        label="Status"
         name="status"
-        className="border rounded px-3 py-2"
-        defaultValue={searchParams.get("status") || ""}
-      >
-        <option value="">All statuses</option>
-        <option value="confirmed">Confirmed</option>
-        <option value="cancelled">Cancelled</option>
-        <option value="pending">Pending</option>
-      </select>
-      <button
-        type="submit"
-        className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700"
-      >
-        Filter
-      </button>
+        defaultValue={searchParams.get("type") || ""}
+        options={[
+          { value: "", label: "All" },
+          { value: "confirmed", label: "Confirmed" },
+          { value: "cancelled", label: "Cancelled" },
+          { value: "pending", label: "Pending" },
+        ]}
+      />
+      <Button type="submit">Filter</Button>
     </form>
   );
 }
