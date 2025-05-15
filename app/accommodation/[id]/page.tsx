@@ -26,9 +26,15 @@ export default async function AccommodationPage({ params }: Props) {
     <div className="max-w-5xl mx-auto p-6">
       <BackButton />
       <AccommodationSummary accommodation={accommodation} />
-      <div className="mt-6 flex justify-center">
-        <Button>Book Now</Button>
-      </div>
+      <AvailabilityForm
+        onSubmit={(formData) => {
+          console.log("Booking attempt:", formData);
+          // You can eventually connect this to an API route or mutation
+        }}
+        status="idle"
+        setStatus={() => {}}
+        accommodation={accommodation} // 💥 pass full object
+      />
     </div>
   );
 }

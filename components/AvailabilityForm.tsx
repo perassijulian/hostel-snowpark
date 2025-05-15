@@ -3,39 +3,40 @@
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import Button from "./Button";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AccommodationType, Accommodation } from "@prisma/client";
 
 interface AvailabilityProps {
-  onSubmit: (formData: {
-    checkIn: string;
-    checkOut: string;
-    guests: number;
-    type: string;
-  }) => void;
-  status: "idle" | "submitting" | "success" | "error";
-  setStatus: (status: "idle" | "submitting" | "success" | "error") => void;
   error?: string | null;
   accommodation?: Accommodation | null;
+  status?: "idle" | "submitting" | "success" | "error";
+  setStatus?: (status: "idle" | "submitting" | "success" | "error") => void;
 }
 
 export default function AvailabilityForm({
-  onSubmit,
-  status,
-  setStatus,
   error = null,
   accommodation = null,
+  status,
+  setStatus,
 }: AvailabilityProps) {
   const MAXGUESTS = 10; // Default max guests if not specified
   const isSpecific = !!accommodation;
   const maxGuests = accommodation?.guests || MAXGUESTS;
 
+  const router = useRouter();
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
     guests: 1,
     type: "DORM",
   });
+
+  const [internalStatus, setInternalStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const effectiveStatus = status ?? internalStatus;
+  const updateStatus = setStatus ?? setInternalStatus;
 
   const lockedType = accommodation?.type || formData.type;
 
@@ -56,7 +57,7 @@ export default function AvailabilityForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus("submitting");
+    updateStatus("submitting");
     setErrorMessage(null);
 
     const { checkIn, checkOut, guests, type } = formData;
@@ -68,44 +69,49 @@ export default function AvailabilityForm({
     // Make sure the dates are valid
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       setErrorMessage("Invalid dates");
-      setStatus("error");
+      updateStatus("error");
       return;
     }
 
     // Make sure the dates are secuential
     if (startDate >= endDate) {
       setErrorMessage("End date is before or same as start date");
-      setStatus("error");
+      updateStatus("error");
       return;
     }
 
     // Existing guest validation
     if (guests < 1) {
       setErrorMessage("Guests should be a positive integer");
-      setStatus("error");
+      updateStatus("error");
       return;
     }
 
     if (guests > maxGuests) {
       setErrorMessage(`Max ${maxGuests} guests allowed for this accommodation`);
-      setStatus("error");
+      updateStatus("error");
       return;
     }
 
     // Make sure type is a valid accommodation type
     if (!typeOptions.includes(type as AccommodationType)) {
       setErrorMessage("Invalid accommodation type");
-      setStatus("error");
+      updateStatus("error");
       return;
     }
 
     try {
-      onSubmit({
-        ...formData,
-        type: lockedType,
+      const params = new URLSearchParams({
+        checkIn,
+        checkOut,
+        guests: guests.toString(),
+        type,
       });
+
+      router.push(`/booking?${params}`);
+      updateStatus("success");
     } catch (err) {
-      setStatus("error");
+      updateStatus("error");
       setErrorMessage("An error occurred while booking");
     }
   };
@@ -160,11 +166,17 @@ export default function AvailabilityForm({
       )}
       {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
 
-      <Button className="mt-4" type="submit" disabled={status === "submitting"}>
-        {status === "submitting" ? "Checking..." : "Check availability"}
+      <Button
+        className="mt-4"
+        type="submit"
+        disabled={effectiveStatus === "submitting"}
+      >
+        {effectiveStatus === "submitting"
+          ? "Checking..."
+          : "Check availability"}
       </Button>
 
-      {status === "error" && (
+      {effectiveStatus === "error" && (
         <p className="text-red-600 mt-2">{errorMessage}</p>
       )}
     </form>
