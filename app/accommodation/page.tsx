@@ -3,7 +3,6 @@
 import { AccommodationCard } from "@/components/AccommodationCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { Accommodation } from "@/types/accommodation";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function AccommodationsPage() {
@@ -14,7 +13,6 @@ export default function AccommodationsPage() {
     fetch("/api/accommodation")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched accommodations:", data);
         setAccommodations(data);
         setIsLoading(false);
       })

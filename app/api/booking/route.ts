@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Check for date overlap
-    console.log("checking for overlap");
     const clash = await prisma.booking.findFirst({
       where: {
         accommodationId,
@@ -83,7 +82,6 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
-    console.log("checking for overlap chekced");
 
     // All good, create booking
     const newBooking = await prisma.booking.create({

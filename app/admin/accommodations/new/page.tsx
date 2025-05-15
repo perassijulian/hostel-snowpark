@@ -161,7 +161,7 @@ export default function NewAccommodationPage() {
           onClientUploadComplete={(res) => {
             if (!res) return;
             const uploadedPictures: PictureForm[] = res.map((file, index) => ({
-              url: file.url,
+              url: file.ufsUrl,
               isPrimary: formData.pictures.length === 0 && index === 0, // first image = primary
             }));
             setFormData((prev) => ({
