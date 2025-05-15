@@ -4,7 +4,7 @@ import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import Button from "./Button";
 import { useState } from "react";
-import { AccommodationType } from "@prisma/client";
+import { AccommodationType, Accommodation } from "@prisma/client";
 
 interface AvailabilityProps {
   onSubmit: (formData: {
@@ -16,6 +16,7 @@ interface AvailabilityProps {
   status: "idle" | "submitting" | "success" | "error";
   setStatus: (status: "idle" | "submitting" | "success" | "error") => void;
   error?: string | null;
+  accommodation?: Accommodation | null;
 }
 
 export default function AvailabilityForm({
@@ -23,13 +24,21 @@ export default function AvailabilityForm({
   status,
   setStatus,
   error = null,
+  accommodation = null,
 }: AvailabilityProps) {
+  const MAXGUESTS = 10; // Default max guests if not specified
+  const isSpecific = !!accommodation;
+  const maxGuests = accommodation?.guests || MAXGUESTS;
+
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
     guests: 1,
     type: "DORM",
   });
+
+  const lockedType = accommodation?.type || formData.type;
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
 
@@ -70,9 +79,15 @@ export default function AvailabilityForm({
       return;
     }
 
-    // Make sure guests is a positive number
+    // Existing guest validation
     if (guests < 1) {
       setErrorMessage("Guests should be a positive integer");
+      setStatus("error");
+      return;
+    }
+
+    if (guests > maxGuests) {
+      setErrorMessage(`Max ${maxGuests} guests allowed for this accommodation`);
       setStatus("error");
       return;
     }
@@ -85,7 +100,10 @@ export default function AvailabilityForm({
     }
 
     try {
-      onSubmit(formData);
+      onSubmit({
+        ...formData,
+        type: lockedType,
+      });
     } catch (err) {
       setStatus("error");
       setErrorMessage("An error occurred while booking");
@@ -128,18 +146,18 @@ export default function AvailabilityForm({
         onChange={handleChange}
         required
       />
-
-      <SelectField
-        label="Accomodation Type"
-        name="type"
-        value={formData.type}
-        onChange={handleChange}
-        options={typeOptions.map((type) => ({
-          value: type,
-          label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
-        }))}
-      />
-
+      {!isSpecific && (
+        <SelectField
+          label="Accomodation Type"
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          options={typeOptions.map((type) => ({
+            value: type,
+            label: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+          }))}
+        />
+      )}
       {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
 
       <Button className="mt-4" type="submit" disabled={status === "submitting"}>
