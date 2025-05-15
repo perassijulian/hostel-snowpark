@@ -4,7 +4,7 @@ import AccommodationSummary from "@/components/AccommodationSummary";
 import BookingForm from "@/components/BookingForm";
 
 type Props = {
-  params: Promise<{ id?: string }>;
+  params: { id?: string };
   searchParams: {
     checkIn?: string;
     checkOut?: string;
