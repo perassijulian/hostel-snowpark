@@ -5,14 +5,20 @@ import AvailabilityForm from "@/components/AvailabilityForm";
 import { useAvailability } from "@/hooks/useAvailability";
 import AccommodationAvailable from "@/components/AccommodationAvailable";
 import { useEffect, useRef, useState } from "react";
+import { Accommodation } from "@/types/accommodation";
 
 export default function BookingPage() {
-  const router = useRouter()
+  const router = useRouter();
   const searchParams = useSearchParams();
   const prevLoading = useRef<boolean>(false);
+
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+
+  const [fallbackResults, setFallbackResults] = useState<Accommodation[]>([]);
+  const [message, setMessage] = useState<string | null>(null);
+  const [skipDefaultFetch, setSkipDefaultFetch] = useState(false);
 
   const id = searchParams.get("id");
   const type = searchParams.get("type");
@@ -29,7 +35,7 @@ export default function BookingPage() {
 
   // Only fetch availability if all are defined
   const shouldFetchAvailability = Boolean(
-    checkIn && checkOut && guests && type
+    checkIn && checkOut && guests && type && !id && !skipDefaultFetch
   );
 
   const { accommodation, availability, loading, error } = useAvailability(
@@ -43,27 +49,44 @@ export default function BookingPage() {
       : null
   );
 
-useEffect(() => {
-  async function checkAvailability() {
-    if (id) {
-      const res = await fetch(`/api/check-availability?id=${id}&checkIn=...`);
-      const { available } = await res.json();
+  // First check availability for specific accommodation ID
+  useEffect(() => {
+    const fetchAvailabilityById = async () => {
+      if (!id || !checkIn || !checkOut) return;
 
-      if (available) {
-        router.replace(`/booking/${id}?checkIn=...`);
-      } else {
-        // fallback to general availability
-        const type = searchParams.get("type");
-        const guests = searchParams.get("guests");
-        const alt = await fetch(`/api/check-availability?type=${type}&checkIn=...`);
-        setFallbackResults(await alt.json());
-        setMessage("Sorry, that accommodation is not available, but these are:");
+      try {
+        const res = await fetch(
+          `/api/check-availability?id=${id}&checkIn=${checkIn}&checkOut=${checkOut}`
+        );
+
+        const { available } = await res.json();
+
+        if (available) {
+          router.replace(
+            `/booking/${id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
+          );
+        } else {
+          setSkipDefaultFetch(false); // allow fallback fetch now
+          const fallbackRes = await fetch(
+            `/api/accommodation/availability?type=${type}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
+          );
+          const fallback = await fallbackRes.json();
+          setFallbackResults(fallback);
+          setMessage(
+            `Sorry, that accommodation is not available, but these are also${type}:`
+          );
+        }
+      } catch (err) {
+        console.error("Error checking specific accommodation:", err);
+        setMessage("Something went wrong while checking availability.");
       }
-    }
-  }
+    };
 
-  checkAvailability();
-}, [id, checkIn, ...]);
+    if (id && checkIn && checkOut) {
+      setSkipDefaultFetch(true); // prevent hook from running too early
+      fetchAvailabilityById();
+    }
+  }, [id, checkIn, checkOut, guests, type]);
 
   useEffect(() => {
     if (!prevLoading.current && loading) {
@@ -105,6 +128,16 @@ useEffect(() => {
             </div>
           )}
         </>
+      )}
+
+      {fallbackResults.length > 0 && (
+        <div className="mt-8">
+          <p className="text-yellow-800 font-medium mb-4">{message}</p>
+          <AccommodationAvailable
+            queryParams={queryParams}
+            available={fallbackResults}
+          />
+        </div>
       )}
     </main>
   );
