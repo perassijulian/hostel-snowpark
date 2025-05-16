@@ -40,6 +40,7 @@ export function useAvailability(params: AvailabilityParams) {
         const res = await fetch(
           `/api/accommodation/availability?${query.toString()}`
         );
+        console.log("useAvailability", res);
         if (!res.ok) throw new Error("Error checking availability.");
 
         const data = await res.json();

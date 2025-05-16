@@ -4,7 +4,13 @@ import { z } from "zod";
 import { AccommodationType } from "@prisma/client";
 
 const querySchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z
+    .string()
+    .transform((val) => (val ? Number(val) : undefined))
+    .refine((val) => val === undefined || !isNaN(val), {
+      message: "Invalid ID",
+    })
+    .optional(),
   type: z.string().optional(),
   checkIn: z
     .string()
@@ -22,14 +28,15 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const result = querySchema.safeParse({
-    id: searchParams.get("id"),
-    type: searchParams.get("type"),
-    checkIn: searchParams.get("checkIn"),
-    checkOut: searchParams.get("checkOut"),
-    guests: searchParams.get("guests"),
+    id: searchParams.get("id") ?? undefined,
+    type: searchParams.get("type") ?? undefined,
+    checkIn: searchParams.get("checkIn") ?? undefined,
+    checkOut: searchParams.get("checkOut") ?? undefined,
+    guests: searchParams.get("guests") ?? undefined,
   });
 
   if (!result.success) {
+    console.error(result.error.flatten());
     return NextResponse.json(
       { error: result.error.flatten() },
       { status: 400 }
