@@ -24,6 +24,7 @@ export default function AvailabilityForm({
   const isSpecific = !!accommodation;
   const maxGuests = accommodation?.guests || MAXGUESTS;
 
+  console.log("maxGuests", maxGuests);
   const router = useRouter();
   const [formData, setFormData] = useState({
     checkIn: "",

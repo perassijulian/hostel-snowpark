@@ -6,6 +6,7 @@ type AvailabilityParams = {
   checkOut: string;
   guests: string;
   type: string;
+  id?: string;
 } | null;
 
 export function useAvailability(params: AvailabilityParams) {
@@ -13,17 +14,25 @@ export function useAvailability(params: AvailabilityParams) {
   const [accommodation, setAccommodation] = useState<Accommodation[] | []>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { checkIn, checkOut, guests, type } = params || {};
+  const { checkIn, checkOut, guests, type, id } = params || {};
 
   useEffect(() => {
-    if (!checkIn || !checkOut || !guests || !type) return;
+    if (!checkIn || !checkOut || !guests || (!type && !id)) return;
 
     const checkAvailability = async () => {
       if (!params) return;
       setLoading(true);
+
+      const query = new URLSearchParams({
+        checkIn,
+        checkOut,
+        guests,
+        ...(id ? { id } : { type: type || "" }),
+      });
+
       try {
         const res = await fetch(
-          `/api/accommodation/availability?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&type=${type}`
+          `/api/accommodation/availability?${query.toString()}`
         );
         if (!res.ok) throw new Error("Error checking availability.");
 
@@ -41,7 +50,13 @@ export function useAvailability(params: AvailabilityParams) {
     };
 
     checkAvailability();
-  }, [params?.checkIn, params?.checkOut, params?.guests, params?.type]);
+  }, [
+    params?.checkIn,
+    params?.checkOut,
+    params?.guests,
+    params?.type,
+    params?.id,
+  ]);
 
   return { accommodation, availability, loading, error };
 }

@@ -1,18 +1,20 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AvailabilityForm from "@/components/AvailabilityForm";
 import { useAvailability } from "@/hooks/useAvailability";
 import AccommodationAvailable from "@/components/AccommodationAvailable";
 import { useEffect, useRef, useState } from "react";
 
 export default function BookingPage() {
+  const router = useRouter()
   const searchParams = useSearchParams();
   const prevLoading = useRef<boolean>(false);
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
 
+  const id = searchParams.get("id");
   const type = searchParams.get("type");
   const checkIn = searchParams.get("checkIn");
   const checkOut = searchParams.get("checkOut");
@@ -40,6 +42,28 @@ export default function BookingPage() {
         }
       : null
   );
+
+useEffect(() => {
+  async function checkAvailability() {
+    if (id) {
+      const res = await fetch(`/api/check-availability?id=${id}&checkIn=...`);
+      const { available } = await res.json();
+
+      if (available) {
+        router.replace(`/booking/${id}?checkIn=...`);
+      } else {
+        // fallback to general availability
+        const type = searchParams.get("type");
+        const guests = searchParams.get("guests");
+        const alt = await fetch(`/api/check-availability?type=${type}&checkIn=...`);
+        setFallbackResults(await alt.json());
+        setMessage("Sorry, that accommodation is not available, but these are:");
+      }
+    }
+  }
+
+  checkAvailability();
+}, [id, checkIn, ...]);
 
   useEffect(() => {
     if (!prevLoading.current && loading) {
