@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AccommodationType } from "@prisma/client";
 
+// --- Zod Validation Schema ---
 const querySchema = z.object({
   id: z
     .string()
@@ -24,6 +25,16 @@ const querySchema = z.object({
     .refine((val) => val > 0, "Guests must be > 0"),
 });
 
+// --- Util: Format Response ---
+function createResponse<T>(data: T, status = 200) {
+  return NextResponse.json({ data, error: null }, { status });
+}
+
+function createError<T>(message: string | object, status = 400) {
+  return NextResponse.json({ data: null, error: message }, { status });
+}
+
+// --- Handler ---
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
@@ -37,10 +48,7 @@ export async function GET(req: Request) {
 
   if (!result.success) {
     console.error(result.error.flatten());
-    return NextResponse.json(
-      { error: result.error.flatten() },
-      { status: 400 }
-    );
+    return createError({ error: result.error.flatten() });
   }
 
   const { id, type, checkIn, checkOut, guests } = result.data;
@@ -50,6 +58,7 @@ export async function GET(req: Request) {
   const startDate = new Date(checkIn);
   const endDate = new Date(checkOut);
 
+  // --- Check specific ID availability first ---
   if (id) {
     // Check if specific accommodation with `id` is available
     const acc = await prisma.accommodation.findUnique({
@@ -58,7 +67,7 @@ export async function GET(req: Request) {
     });
 
     if (!acc || acc.guests < guests) {
-      return NextResponse.json([]); // Not found or doesn't support guest count
+      return createResponse([]);
     }
 
     const overlappingBooking = await prisma.booking.findFirst({
@@ -72,19 +81,20 @@ export async function GET(req: Request) {
         ],
       },
     });
+    console.log(overlappingBooking);
 
     if (!overlappingBooking) {
-      return NextResponse.json([acc]); // Available!
+      return createResponse([acc]); // Available!
     }
 
     // Not available, continue to search by type fallback
   }
 
   if (!type) {
-    return NextResponse.json([], { status: 200 }); // nothing to suggest if type is also missing
+    return createResponse([]); // No type to fallback to
   }
 
-  // Step 1: Get all accommodations of the right type that support this guest count
+  // --- Fallback Search by Type ---
   const accommodations = await prisma.accommodation.findMany({
     where: {
       type: typedType,
@@ -93,7 +103,6 @@ export async function GET(req: Request) {
     include: { pictures: true },
   });
 
-  // Step 2: Filter those without bookings in the selected date range
   const available = [];
 
   for (const acc of accommodations) {
@@ -114,5 +123,5 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json(available);
+  return createResponse(available);
 }
