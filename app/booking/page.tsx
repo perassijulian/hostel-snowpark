@@ -52,16 +52,26 @@ export default function BookingPage() {
   // First check availability for specific accommodation ID
   useEffect(() => {
     const fetchAvailabilityById = async () => {
-      if (!id || !checkIn || !checkOut) return;
+      if (!id || !checkIn || !checkOut || !guests) return;
 
       try {
-        const res = await fetch(
-          `/api/check-availability?id=${id}&checkIn=${checkIn}&checkOut=${checkOut}`
-        );
+        const params = new URLSearchParams();
 
-        const { available } = await res.json();
+        if (checkIn) params.set("checkIn", checkIn);
+        if (checkOut) params.set("checkOut", checkOut);
+        if (guests) params.set("guests", guests);
+        if (type) params.set("type", type);
+        if (id) params.set("id", id.toString());
 
-        if (available) {
+        const res = await fetch(`/api/accommodation/availability?${params}`);
+
+        console.log(res, "RESSSSSSSSS");
+
+        const available = await res.json();
+
+        console.log(available, "available");
+
+        if (available.length > 0) {
           router.replace(
             `/booking/${id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
           );

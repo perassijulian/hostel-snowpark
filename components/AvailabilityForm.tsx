@@ -24,13 +24,12 @@ export default function AvailabilityForm({
   const isSpecific = !!accommodation;
   const maxGuests = accommodation?.guests || MAXGUESTS;
 
-  console.log("maxGuests", maxGuests);
   const router = useRouter();
   const [formData, setFormData] = useState({
     checkIn: "",
     checkOut: "",
     guests: 1,
-    type: "DORM",
+    type: "",
   });
 
   const [internalStatus, setInternalStatus] = useState<
@@ -38,8 +37,6 @@ export default function AvailabilityForm({
   >("idle");
   const effectiveStatus = status ?? internalStatus;
   const updateStatus = setStatus ?? setInternalStatus;
-
-  const lockedType = accommodation?.type || formData.type;
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const typeOptions = Object.values(AccommodationType); // ['DORM', 'PRIVATE', ...]
@@ -52,7 +49,8 @@ export default function AvailabilityForm({
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "guests" ? parseInt(value) : value,
+      [name]:
+        name === "guests" ? (value === "" ? "" : parseInt(value) || 1) : value,
     }));
   };
 
@@ -62,6 +60,8 @@ export default function AvailabilityForm({
     setErrorMessage(null);
 
     const { checkIn, checkOut, guests, type } = formData;
+
+    const lockedType = accommodation?.type || type;
 
     // Convert check-in and check-out to Date objects before sending them to the backend
     const startDate = new Date(checkIn);
@@ -82,7 +82,7 @@ export default function AvailabilityForm({
     }
 
     // Existing guest validation
-    if (guests < 1) {
+    if (isNaN(guests) || guests < 1) {
       setErrorMessage("Guests should be a positive integer");
       updateStatus("error");
       return;
@@ -95,7 +95,7 @@ export default function AvailabilityForm({
     }
 
     // Make sure type is a valid accommodation type
-    if (!typeOptions.includes(type as AccommodationType)) {
+    if (!typeOptions.includes(lockedType as AccommodationType)) {
       setErrorMessage("Invalid accommodation type");
       updateStatus("error");
       return;
@@ -106,9 +106,12 @@ export default function AvailabilityForm({
         checkIn,
         checkOut,
         guests: guests.toString(),
-        type,
+        type: lockedType,
       });
 
+      if (accommodation) {
+        params.set("id", accommodation.id.toString());
+      }
       router.push(`/booking?${params}`);
       updateStatus("success");
     } catch (err) {
@@ -149,7 +152,7 @@ export default function AvailabilityForm({
         type="number"
         name="guests"
         min="1"
-        value={formData.guests}
+        value={formData.guests || ""}
         onChange={handleChange}
         required
       />
