@@ -65,13 +65,9 @@ export default function BookingPage() {
 
         const res = await fetch(`/api/accommodation/availability?${params}`);
 
-        console.log(res, "RESSSSSSSSS");
-
         const available = await res.json();
 
-        console.log(available, "available");
-
-        if (available.length > 0) {
+        if (available.data.length > 0) {
           router.replace(
             `/booking/${id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
           );
