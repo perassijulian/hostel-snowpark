@@ -4,15 +4,17 @@ import AccommodationSummary from "@/components/AccommodationSummary";
 import BookingForm from "@/components/BookingForm";
 
 type Props = {
-  params: { id: string };
-  searchParams: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{
     checkIn?: string;
     checkOut?: string;
     guests?: string;
-  };
+  }>;
 };
 
-export default async function BookingPage({ params, searchParams }: Props) {
+export default async function BookingPage(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { id: rawId } = params;
   const id = Number(rawId);
   if (isNaN(id)) return notFound();
