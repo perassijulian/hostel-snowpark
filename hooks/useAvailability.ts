@@ -14,27 +14,23 @@ export function useAvailability(params: AvailabilityParams) {
   const [accommodation, setAccommodation] = useState<Accommodation[] | []>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const {
-    checkIn = "",
-    checkOut = "",
-    guests = "",
-    type = "",
-    id = "",
-  } = params || {};
-
-  const query = new URLSearchParams({
-    checkIn,
-    checkOut,
-    guests,
-    ...(id ? { id } : { type: type || "" }),
-  });
 
   useEffect(() => {
+    if (!params) return;
+    const { checkIn, checkOut, guests, type = "", id = "" } = params;
+
     if (!checkIn || !checkOut || !guests || (!type && !id)) return;
 
+    const query = new URLSearchParams({
+      checkIn,
+      checkOut,
+      guests,
+      ...(id ? { id } : { type }),
+    });
+
     const checkAvailability = async () => {
-      if (!params) return;
       setLoading(true);
+      setError(null);
 
       try {
         const res = await fetch(
@@ -72,6 +68,6 @@ export function useAvailability(params: AvailabilityParams) {
     availability,
     loading,
     error,
-    searchedById: Boolean(id),
+    searchedById: Boolean(params?.id),
   };
 }
