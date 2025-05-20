@@ -64,22 +64,21 @@ export default function BookingPage() {
         if (id) params.set("id", id.toString());
 
         const res = await fetch(`/api/accommodation/availability?${params}`);
-
         const available = await res.json();
+        const data = available.data;
 
-        if (available.data.length > 0) {
+        if (data.length === 1 && data[0].id.toString() === id) {
           router.replace(
             `/booking/${id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
           );
-        } else {
-          setSkipDefaultFetch(false); // allow fallback fetch now
-          const fallbackRes = await fetch(
-            `/api/accommodation/availability?type=${type}&checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
-          );
-          const fallback = await fallbackRes.json();
-          setFallbackResults(fallback);
+        } else if (data.length > 0) {
+          setFallbackResults(data);
           setMessage(
-            `Sorry, that accommodation is not available, but these are also${type}:`
+            `Sorry, that accommodation is not available, but those days this ${type} are:`
+          );
+        } else {
+          setMessage(
+            "Sorry, no accommodations are available for your criteria."
           );
         }
       } catch (err) {
