@@ -13,11 +13,11 @@ type Props = {
 };
 
 export default async function BookingPage({ params, searchParams }: Props) {
-  const { id: rawId } = await params;
+  const { id: rawId } = params;
   const id = Number(rawId);
   if (isNaN(id)) return notFound();
 
-  const { checkIn, checkOut, guests } = await searchParams;
+  const { checkIn, checkOut, guests } = searchParams;
 
   // Ensure required query params are present
   if (!checkIn || !checkOut || !guests) {
