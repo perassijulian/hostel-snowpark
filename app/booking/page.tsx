@@ -135,14 +135,18 @@ export default function BookingPage() {
         </>
       )}
 
-      {fallbackResults.length > 0 && (
-        <div className="mt-8">
-          <p className="text-yellow-800 font-medium mb-4">{message}</p>
-          <AccommodationAvailable
-            queryParams={queryParams}
-            available={fallbackResults}
-          />
-        </div>
+      {message && (
+        <>
+          <div className="mt-8">
+            <p className="text-yellow-800 font-medium mb-4">{message}</p>
+          </div>
+          {fallbackResults.length > 0 && (
+            <AccommodationAvailable
+              queryParams={queryParams}
+              available={fallbackResults}
+            />
+          )}
+        </>
       )}
     </main>
   );
