@@ -65,12 +65,8 @@ export async function POST(req: NextRequest) {
     const clash = await prisma.booking.findFirst({
       where: {
         accommodationId,
-        OR: [
-          {
-            startDate: { lte: end },
-            endDate: { gte: start },
-          },
-        ],
+        startDate: { lt: end },
+        endDate: { gt: start },
       },
     });
 

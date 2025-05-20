@@ -73,15 +73,10 @@ export async function GET(req: Request) {
     const overlappingBooking = await prisma.booking.findFirst({
       where: {
         accommodationId: Number(id),
-        OR: [
-          {
-            startDate: { lt: endDate },
-            endDate: { gt: startDate },
-          },
-        ],
+        startDate: { lt: endDate },
+        endDate: { gt: startDate },
       },
     });
-    console.log(overlappingBooking);
 
     if (!overlappingBooking) {
       return createResponse([acc]); // Available!
@@ -109,12 +104,8 @@ export async function GET(req: Request) {
     const overlappingBookings = await prisma.booking.findFirst({
       where: {
         accommodationId: acc.id,
-        OR: [
-          {
-            startDate: { lt: endDate },
-            endDate: { gt: startDate },
-          },
-        ],
+        startDate: { lt: endDate },
+        endDate: { gt: startDate },
       },
     });
 
