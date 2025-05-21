@@ -13,12 +13,8 @@ const querySchema = z.object({
     })
     .optional(),
   type: z.string().optional(),
-  checkIn: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), "Invalid start date"),
-  checkOut: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), "Invalid end date"),
+  checkIn: z.coerce.date(),
+  checkOut: z.coerce.date(),
   guests: z
     .string()
     .transform(Number)
@@ -55,9 +51,6 @@ export async function GET(req: Request) {
 
   const typedType = type as AccommodationType;
 
-  const startDate = new Date(checkIn);
-  const endDate = new Date(checkOut);
-
   // --- Check specific ID availability first ---
   if (id) {
     // Check if specific accommodation with `id` is available
@@ -73,8 +66,8 @@ export async function GET(req: Request) {
     const overlappingBooking = await prisma.booking.findFirst({
       where: {
         accommodationId: Number(id),
-        startDate: { lt: endDate },
-        endDate: { gt: startDate },
+        startDate: { lt: checkOut },
+        endDate: { gt: checkIn },
       },
     });
 
@@ -104,8 +97,8 @@ export async function GET(req: Request) {
     const overlappingBookings = await prisma.booking.findFirst({
       where: {
         accommodationId: acc.id,
-        startDate: { lt: endDate },
-        endDate: { gt: startDate },
+        startDate: { lt: checkOut },
+        endDate: { gt: checkIn },
       },
     });
 
