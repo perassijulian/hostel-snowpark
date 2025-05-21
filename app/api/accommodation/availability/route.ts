@@ -32,7 +32,7 @@ function createError<T>(message: string | object, status = 400) {
 }
 
 // --- Handler ---
-export async function GET(req: Request) {
+export default async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const result = querySchema.safeParse({

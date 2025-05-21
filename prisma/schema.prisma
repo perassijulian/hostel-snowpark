@@ -7,28 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum AccommodationType {
-  DORM
-  PRIVATE
-  SUITE
-  CABIN
-  TENT
-  OTHER
-}
-
 model Booking {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String
-  phone     String
-  startDate DateTime
-  endDate   DateTime
-  guests    Int
-  createdAt DateTime @default(now())
-
-  // Relations
-  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  id              Int           @id @default(autoincrement())
+  name            String
+  email           String
+  phone           String
+  startDate       DateTime
+  endDate         DateTime
+  guests          Int
+  createdAt       DateTime      @default(now())
   accommodationId Int
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
 }
 
 model Volunteer {
@@ -40,27 +29,25 @@ model Volunteer {
 }
 
 model Accommodation {
-  id          Int       @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   name        String
   description String
-  type        AccommodationType
   price       Float
   guests      Int
-  pictures    Picture[] @relation("AccommodationPictures")
-  createdAt   DateTime  @default(now())
-
-  //Relations
-  bookings Booking[]
+  createdAt   DateTime          @default(now())
+  type        AccommodationType
+  bookings    Booking[]
+  pictures    Picture[]         @relation("AccommodationPictures")
 }
 
 model Picture {
   id              Int            @id @default(autoincrement())
   url             String
-  accommodation   Accommodation? @relation("AccommodationPictures", fields: [accommodationId], references: [id])
   accommodationId Int?
   isPrimary       Boolean
   caption         String?
   altText         String?
+  accommodation   Accommodation? @relation("AccommodationPictures", fields: [accommodationId], references: [id])
 }
 
 model Account {
@@ -105,4 +92,13 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum AccommodationType {
+  DORM
+  PRIVATE
+  SUITE
+  CABIN
+  TENT
+  OTHER
 }
