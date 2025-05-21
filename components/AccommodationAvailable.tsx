@@ -17,7 +17,7 @@ export default function AccommodationAvailable({
   if (!available || available.length === 0) return null;
 
   return (
-    <div className="m-4 gap-6">
+    <div className="gap-6">
       {available.map((a) => (
         <AccommodationCard
           key={a.id}

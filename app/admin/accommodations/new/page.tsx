@@ -9,6 +9,7 @@ import Link from "next/link";
 import { PictureForm } from "@/types/accommodation";
 import { AccommodationType } from "@prisma/client";
 import SelectField from "@/components/SelectField";
+import Button from "@/components/Button";
 
 export default function NewAccommodationPage() {
   const router = useRouter();
@@ -227,16 +228,16 @@ export default function NewAccommodationPage() {
         )}
 
         <div className="flex justify-end space-x-2">
-          <button
+          <Button
             type="button"
             onClick={() => router.push("/admin/accommodations")}
-            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
+            className="bg-red-500 hover:bg-red-600 w-30"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className={`px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition ${
+            className={`w-30 ${
               status === "submitting" || isUploading
                 ? "pointer-none hover:bg-gray-800"
                 : ""
@@ -244,7 +245,7 @@ export default function NewAccommodationPage() {
             disabled={status === "submitting" || isUploading}
           >
             {status === "submitting" || isUploading ? "Submiting..." : "Save"}
-          </button>
+          </Button>
         </div>
       </form>
     </main>
