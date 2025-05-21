@@ -48,7 +48,7 @@ export async function GET(req: Request) {
 
   if (!result.success) {
     console.error(result.error.flatten());
-    return createError({ error: result.error.flatten() });
+    return createError(result.error.flatten());
   }
 
   const { id, type, checkIn, checkOut, guests } = result.data;
