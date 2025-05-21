@@ -123,7 +123,7 @@ export default function AvailabilityForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`grid gap-4 duration-200 ${
+      className={`grid gap-4 mt-6 duration-200 ${
         status === "submitting" ? "opacity-50 pointer-events-none" : ""
       }`}
     >
