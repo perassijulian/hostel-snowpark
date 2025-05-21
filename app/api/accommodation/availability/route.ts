@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AccommodationType } from "@prisma/client";
+import { Accommodation } from "@/types/accommodation";
 
 // --- Zod Validation Schema ---
 const querySchema = z.object({
@@ -91,21 +92,17 @@ export async function GET(req: Request) {
     include: { pictures: true },
   });
 
-  const available = [];
-
-  for (const acc of accommodations) {
-    const overlappingBookings = await prisma.booking.findFirst({
-      where: {
-        accommodationId: acc.id,
-        startDate: { lt: checkOut },
-        endDate: { gt: checkIn },
-      },
-    });
-
-    if (!overlappingBookings) {
-      available.push(acc);
-    }
-  }
-
-  return createResponse(available);
+  const available = await Promise.all(
+    accommodations.map(async (acc) => {
+      const overlappingBookings = await prisma.booking.findFirst({
+        where: {
+          accommodationId: acc.id,
+          startDate: { lt: checkOut },
+          endDate: { gt: checkIn },
+        },
+      });
+      return !overlappingBookings ? acc : null;
+    })
+  );
+  return createResponse(available.filter((a) => a !== null));
 }
