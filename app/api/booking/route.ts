@@ -1,72 +1,46 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+
+// --- Zod Validation Schema ---
+const bookingSchema = z
+  .object({
+    name: z.string().min(1),
+    email: z.string().email(),
+    phone: z.string().min(5),
+    guests: z.coerce.number().int().min(1).max(99),
+    checkIn: z.coerce
+      .date()
+      .refine((d) => d >= new Date(), "Check-in cannot be on the past"),
+    checkOut: z.coerce.date(),
+    accommodationId: z.coerce.number().int(),
+  })
+  .refine((data) => data.checkIn < data.checkOut, {
+    message: "Check-in must be before check-out",
+    path: ["checkOut"],
+  });
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const guests = Number(body.guests);
-    const {
-      name,
-      email,
-      phone,
-      checkIn: startDate,
-      checkOut: endDate,
-      accommodationId,
-    } = body;
-
-    // 🔐 Validate fields
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !startDate ||
-      !endDate ||
-      !guests ||
-      !accommodationId
-    ) {
+    const json = await req.json();
+    const result = bookingSchema.safeParse(json);
+    if (!result.success) {
+      console.log(result.error.format());
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: result.error.flatten() },
         { status: 400 }
       );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      );
-    }
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      return NextResponse.json(
-        { error: "Invalid date format" },
-        { status: 400 }
-      );
-    }
-
-    if (start >= end) {
-      return NextResponse.json(
-        { error: "Start date must be before end date" },
-        { status: 400 }
-      );
-    }
-
-    if (!Number.isInteger(guests) || guests < 1) {
-      return NextResponse.json(
-        { error: "Invalid number of guests" },
-        { status: 400 }
-      );
-    }
+    const { name, email, phone, guests, checkIn, checkOut, accommodationId } =
+      result.data;
 
     // Check for date overlap
     const clash = await prisma.booking.findFirst({
       where: {
         accommodationId,
-        startDate: { lt: end },
-        endDate: { gt: start },
+        startDate: { lt: checkOut },
+        endDate: { gt: checkIn },
       },
     });
 
@@ -85,8 +59,8 @@ export async function POST(req: NextRequest) {
         name,
         email,
         phone,
-        startDate: start,
-        endDate: end,
+        startDate: checkIn,
+        endDate: checkOut,
         guests,
         accommodationId,
       },
