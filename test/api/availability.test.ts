@@ -79,14 +79,12 @@ describe("GET /api/accommodation/availability", () => {
   });
 
   it("returns 400 if required query is missing", async () => {
-    console.log("🚨 Testing missing query validation...");
     const res = await request(app).get("/api/accommodation/availability");
     expect(res.status).toBe(400);
     expect(res.body.error).toBeDefined();
   });
 
   it("returns accommodation by ID if available", async () => {
-    console.log("✅ Testing availability by ID (availableRoom)...");
     const res = await request(app)
       .get("/api/accommodation/availability")
       .query({
@@ -103,7 +101,6 @@ describe("GET /api/accommodation/availability", () => {
   });
 
   it("returns empty array if accommodation ID is not available", async () => {
-    console.log("❌ Testing availability by ID (unavailableRoom)...");
     const res = await request(app)
       .get("/api/accommodation/availability")
       .query({
@@ -118,7 +115,6 @@ describe("GET /api/accommodation/availability", () => {
   });
 
   it("returns available fallback accommodation by type if no ID is given", async () => {
-    console.log("🔄 Testing fallback availability by type...");
     const res = await request(app)
       .get("/api/accommodation/availability")
       .query({
@@ -134,7 +130,6 @@ describe("GET /api/accommodation/availability", () => {
   });
 
   it("returns only available accommodations matching the type and guest count", async () => {
-    console.log("🔍 Testing fallback availability with fully booked dates...");
     const res = await request(app)
       .get("/api/accommodation/availability")
       .query({
@@ -150,7 +145,7 @@ describe("GET /api/accommodation/availability", () => {
     );
   });
 
-  // 🧪 🔄 Overlapping Dates (Edge Cases)
+  // 🧪 🔄 Overlapping Dates
   it("excludes exact overlapping dates", async () => {
     const res = await request(app)
       .get("/api/accommodation/availability")

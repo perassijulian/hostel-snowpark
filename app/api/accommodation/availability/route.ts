@@ -2,25 +2,34 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { AccommodationType } from "@prisma/client";
-import { Accommodation } from "@/types/accommodation";
 
 // --- Zod Validation Schema ---
-const querySchema = z.object({
-  id: z
-    .string()
-    .transform((val) => (val ? Number(val) : undefined))
-    .refine((val) => val === undefined || !isNaN(val), {
-      message: "Invalid ID",
-    })
-    .optional(),
-  type: z.string().optional(),
-  checkIn: z.coerce.date(),
-  checkOut: z.coerce.date(),
-  guests: z
-    .string()
-    .transform(Number)
-    .refine((val) => val > 0, "Guests must be > 0"),
-});
+const querySchema = z
+  .object({
+    id: z
+      .string()
+      .transform((val) => (val ? Number(val) : undefined))
+      .refine((val) => val === undefined || !isNaN(val), {
+        message: "Invalid ID",
+      })
+      .optional(),
+    type: z.nativeEnum(AccommodationType).optional(),
+    checkIn: z.coerce
+      .date()
+      .refine((d) => d >= new Date(), "Check-in cannot be on the past"),
+    checkOut: z.coerce.date(),
+    guests: z
+      .string()
+      .transform(Number)
+      .refine(
+        (val) => val > 0 && val < 100,
+        "Guests must be between 0 and 100"
+      ),
+  })
+  .refine((data) => data.checkIn < data.checkOut, {
+    message: "Check-in date must be before check-out date",
+    path: ["checkOut"],
+  });
 
 // --- Util: Format Response ---
 function createResponse<T>(data: T, status = 200) {
