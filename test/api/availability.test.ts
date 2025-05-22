@@ -149,4 +149,145 @@ describe("GET /api/accommodation/availability", () => {
       unavailableRoom.id
     );
   });
+
+  // 🧪 🔄 Overlapping Dates (Edge Cases)
+  it("excludes exact overlapping dates", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        type: "PRIVATE",
+        guests: 2,
+        checkIn: "2025-06-01",
+        checkOut: "2025-06-05",
+      });
+
+    expect(res.body.data.map((a: any) => a.id)).not.toContain(
+      unavailableRoom.id
+    );
+  });
+
+  it("excludes partial overlap (inside booking range)", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        type: "PRIVATE",
+        guests: 2,
+        checkIn: "2025-06-03",
+        checkOut: "2025-06-06",
+      });
+
+    expect(res.body.data.map((a: any) => a.id)).not.toContain(
+      unavailableRoom.id
+    );
+  });
+
+  it("allows booking starting the day another ends", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        type: "PRIVATE",
+        guests: 2,
+        checkIn: "2025-06-05",
+        checkOut: "2025-06-08",
+      });
+
+    expect(res.body.data.map((a: any) => a.id)).toContain(unavailableRoom.id);
+  });
+
+  it("allows booking ending the day another starts", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        type: "PRIVATE",
+        guests: 2,
+        checkIn: "2025-05-28",
+        checkOut: "2025-06-01",
+      });
+
+    expect(res.body.data.map((a: any) => a.id)).toContain(unavailableRoom.id);
+  });
+
+  // 🧪 🎭 Type Mismatches
+  it("returns empty if requesting CABIN type but only PRIVATE exists", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        type: "CABIN",
+        guests: 2,
+        checkIn: "2025-06-10",
+        checkOut: "2025-06-12",
+      });
+
+    expect(res.body.data).toHaveLength(0);
+  });
+
+  // 🧪 👥 Guest Count Filtering
+  it("excludes room if guests exceed room capacity", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        guests: 3,
+        type: "PRIVATE",
+        checkIn: "2025-06-10",
+        checkOut: "2025-06-12",
+      });
+
+    expect(res.body.data.map((a: any) => a.id)).not.toContain(availableRoom.id);
+  });
+
+  it("includes room if guests fit within capacity", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        guests: 1,
+        type: "PRIVATE",
+        checkIn: "2025-06-10",
+        checkOut: "2025-06-12",
+      });
+
+    expect(res.body.data.map((a: any) => a.id)).toContain(availableRoom.id);
+  });
+
+  // 🧪 ❌ Invalid Input
+  it("returns 400 on invalid date format", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        guests: 2,
+        type: "PRIVATE",
+        checkIn: "not-a-date",
+        checkOut: "2025-06-12",
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 if checkOut is before checkIn", async () => {
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        guests: 2,
+        type: "PRIVATE",
+        checkIn: "2025-06-12",
+        checkOut: "2025-06-10",
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  // 🧪 🔄 No Matches At All
+  it("returns empty if no accommodations exist", async () => {
+    await prisma.booking.deleteMany();
+    await prisma.accommodation.deleteMany();
+    const res = await request(app)
+      .get("/api/accommodation/availability")
+      .query({
+        guests: 2,
+        type: "PRIVATE",
+        checkIn: "2025-06-10",
+        checkOut: "2025-06-12",
+      });
+
+    expect(res.body.data).toHaveLength(0);
+  });
 });
