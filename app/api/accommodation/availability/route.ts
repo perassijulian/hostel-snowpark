@@ -33,6 +33,10 @@ function createError<T>(message: string | object, status = 400) {
 
 // --- Handler ---
 export async function GET(req: Request) {
+  return await handleAvailability(req);
+}
+
+export async function handleAvailability(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const result = querySchema.safeParse({

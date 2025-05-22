@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { Readable } from "stream";
-import handler from "@/app/api/accommodation/availability/route"; // your Route Handler
+import { handleAvailability } from "@/app/api/accommodation/availability/route"; // your Route Handler
 
 export const app = createServer(async (req, res) => {
   const { method, headers, url } = req;
@@ -23,7 +23,7 @@ export const app = createServer(async (req, res) => {
     body: method === "GET" || method === "HEAD" ? undefined : body,
   });
 
-  const response = await handler(request);
+  const response = await handleAvailability(request);
 
   // Pipe response to native http.ServerResponse
   res.writeHead(
