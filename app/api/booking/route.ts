@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { create } from "domain";
 
 // --- Zod Validation Schema ---
 const bookingSchema = z
@@ -20,16 +21,21 @@ const bookingSchema = z
     path: ["checkOut"],
   });
 
+// --- Util: Format Response ---
+function createResponse<T>(data: T, status = 200) {
+  return NextResponse.json({ data, error: null }, { status });
+}
+
+function createError<T>(message: string | object, status = 400) {
+  return NextResponse.json({ data: null, error: message }, { status });
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const json = await req.json();
-    const result = bookingSchema.safeParse(json);
+    const result = bookingSchema.safeParse(await req.json());
     if (!result.success) {
-      console.log(result.error.format());
-      return NextResponse.json(
-        { error: result.error.flatten() },
-        { status: 400 }
-      );
+      console.error(result.error.flatten());
+      return createError(result.error.flatten());
     }
 
     const { name, email, phone, guests, checkIn, checkOut, accommodationId } =
@@ -45,11 +51,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (clash) {
-      return NextResponse.json(
-        {
-          error: "Selected dates are unavailable. Please try another range",
-        },
-        { status: 409 }
+      return createError(
+        "Selected dates are unavailable. Please try another range"
       );
     }
 
@@ -66,12 +69,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(newBooking);
+    return createResponse(newBooking);
   } catch (error) {
     console.error("Booking Error:", error);
-    return NextResponse.json(
-      { error: "Failed to process booking" },
-      { status: 500 }
-    );
+    return createError("Failed to process booking", 500);
   }
 }
