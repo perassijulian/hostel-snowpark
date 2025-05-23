@@ -20,6 +20,7 @@ A full-stack booking system designed for a snowpark-hostel hybrid — built with
 
 ## 🧱 Project Structure
 
+```txt
 .
 ├── app
 │ ├── accommodation # SSR detail pages with booking intent forms
@@ -42,6 +43,7 @@ A full-stack booking system designed for a snowpark-hostel hybrid — built with
 ├── utils # File upload helpers
 ├── booking-flow-design.md # Architectural breakdown
 └── README.md # You’re here!
+```
 
 ---
 
@@ -79,21 +81,22 @@ npm run test
 
 ## 📚 Docs & Design
 
-    •	[booking-flow-design.md](./booking-flow-design.md) — explains the dual-flow challenge and architecture
-    •	[future-steps.md](./future-steps.md) — explains the potential improvements
-    •	/admin — authenticated dashboard for filtering and reviewing bookings
-    •	/middleware.ts — route protection for secure admin access
+- [booking-flow-design.md](./booking-flow-design.md) — explains the dual-flow challenge and architecture
+- [future-steps.md](./future-steps.md) — explains the potential improvements
+- /admin — authenticated dashboard for filtering and reviewing bookings
+- /middleware.ts — route protection for secure admin access
 
 ⸻
 
 ## 🔮 Potential Improvements
 
 ✅ Already planned and/or in progress:
-• 🌐 Form loading UX and syncing with query params
-• 📦 Extract form validation into reusable utilities
-• 🔁 Toast notifications or modal components to decouple UI feedback
-• 📅 Use a real booking calendar UI (react-day-picker)
-• 🛡️ Add rate limiting and bot protection on API routes
+
+- 🌐 Form loading UX and syncing with query params
+- 📦 Extract form validation into reusable utilities
+- 🔁 Toast notifications or modal components to decouple UI feedback
+- 📅 Use a real booking calendar UI (react-day-picker)
+- 🛡️ Add rate limiting and bot protection on API routes
 
 ⸻
 
