@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏔️ Snowpark Hostel Booking
 
-## Getting Started
+A full-stack booking system designed for a snowpark-hostel hybrid — built with modern web technologies, focused on maintainability, and structured to support both short-term guests and long-term volunteers.
 
-First, run the development server:
+---
+
+## ✨ Features
+
+- 🔍 **Search & Book** accommodations based on date and guest count
+- 📄 **Detail pages** for each accommodation (`/accommodation/[id]`)
+- 🛏️ **Flexible booking flow**: from search or direct links
+- 🧑‍💻 **Admin panel** for booking management (`/admin`)
+- 📅 **Dynamic availability validation** and summaries
+- 🧠 **Custom forms** for guests and volunteers
+- 🔐 **Authentication** with `NextAuth.js`
+- ⚙️ **Middleware-protected routes**
+- 🧪 **Test suite** using `Vitest`
+
+---
+
+## 🧱 Project Structure
+
+.
+├── app
+│ ├── accommodation # SSR detail pages with booking intent forms
+│ ├── admin # Booking filters and admin actions
+│ ├── api # API routes (bookings, availability, etc.)
+│ ├── booking # Booking logic and search flows
+│ ├── contact # Contact form (optional)
+│ ├── volunteer # Volunteer sign-up and data collection
+│ ├── globals.css # Tailwind styles
+│ ├── layout.tsx # App layout
+│ └── providers.tsx # Context providers
+├── components # Shared UI components (Forms, Cards, etc.)
+├── lib # Utilities: DB, Auth, Prisma
+├── hooks # Custom React hooks
+├── middleware.ts # Auth middleware
+├── prisma # Prisma schema and migrations
+├── public # Images, favicon
+├── test # API tests and setup
+├── types # Shared TypeScript types
+├── utils # File upload helpers
+├── booking-flow-design.md # Architectural breakdown
+└── README.md # You’re here!
+
+---
+
+## 🛠️ Tech Stack
+
+- **Next.js** (App Router)
+- **React** + **TypeScript**
+- **Tailwind CSS** for styling
+- **Prisma** + **PostgreSQL** for database
+- **NextAuth.js** for authentication
+- **Vitest** for testing
+- **Zod** for validations
+- **Uploadthing** for file handling
+
+---
+
+## 🚀 Getting Started
 
 ```bash
+git clone https://github.com/yourname/snowpark-booking
+cd snowpark-booking
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧪 Running Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run test
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📚 Docs & Design
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    •	[booking-flow-design.md](./booking-flow-design.md) — explains the dual-flow challenge and architecture
+    •	[future-steps.md](./future-steps.md) — explains the potential improvements
+    •	/admin — authenticated dashboard for filtering and reviewing bookings
+    •	/middleware.ts — route protection for secure admin access
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+⸻
 
-## Deploy on Vercel
+## 🔮 Potential Improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+✅ Already planned and/or in progress:
+• 🌐 Form loading UX and syncing with query params
+• 📦 Extract form validation into reusable utilities
+• 🔁 Toast notifications or modal components to decouple UI feedback
+• 📅 Use a real booking calendar UI (react-day-picker)
+• 🛡️ Add rate limiting and bot protection on API routes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+⸻
+
+## 👤 Author
+
+Made with 💚 by Julian
+Let’s connect on LinkedIn or explore more on GitHub
