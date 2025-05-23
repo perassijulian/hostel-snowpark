@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { Readable } from "stream";
-import { handleAvailability } from "@/app/api/accommodation/availability/route"; // your Route Handler
+import { handleAvailability } from "./handlers/accommodation";
 
 export const app = createServer(async (req, res) => {
   const { method, headers, url } = req;
