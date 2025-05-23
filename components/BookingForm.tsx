@@ -82,6 +82,32 @@ export default function BookingForm({
       return;
     }
 
+    // Checking guests amounts
+    if (formData.guests > accommodation.maxGuests) {
+      setErrorMessage(
+        `This accommodation allows up to ${accommodation.maxGuests} guests.`
+      );
+      setStatus("error");
+      return;
+    }
+    if (formData.guests < 1) {
+      setErrorMessage("At least one guest is required");
+      setStatus("error");
+      return;
+    }
+
+    // Checking dates
+    if (new Date(formData.checkIn) >= new Date(formData.checkOut)) {
+      setErrorMessage("Check-out must be after check-in");
+      setStatus("error");
+      return;
+    }
+
+    if (new Date(formData.checkIn) < new Date()) {
+      setErrorMessage("Check-in cannot be in the past");
+      setStatus("error");
+      return;
+    }
     const res = await fetch("/api/booking", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
