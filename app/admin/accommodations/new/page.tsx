@@ -227,6 +227,15 @@ export default function NewAccommodationPage() {
           </div>
         )}
 
+        {status === "error" && errorMessage && (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative animate-fade-in"
+          >
+            <strong className="font-semibold">Oops!</strong> {errorMessage}
+          </div>
+        )}
         <div className="flex justify-end space-x-2">
           <Button
             type="button"
