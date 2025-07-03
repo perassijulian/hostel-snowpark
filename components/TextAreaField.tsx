@@ -19,13 +19,16 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
 }) => {
   return (
     <div>
-      <label className="block font-medium mb-1">{label}</label>
+      <label htmlFor={name} className="block font-medium mb-1">
+        {label}
+      </label>
       <textarea
+        id={name}
         name={name}
         value={value}
         onChange={onChange}
         required={required}
-        className="w-full p-2 border rounded"
+        className="w-full border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 rounded-md shadow-sm transition duration-200"
         rows={rows}
       />
     </div>
