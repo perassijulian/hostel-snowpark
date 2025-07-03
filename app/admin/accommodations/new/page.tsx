@@ -246,11 +246,7 @@ export default function NewAccommodationPage() {
           </Button>
           <Button
             type="submit"
-            className={`w-30 ${
-              status === "submitting" || isUploading
-                ? "pointer-none hover:bg-gray-800"
-                : ""
-            }`}
+            className="w-30"
             disabled={status === "submitting" || isUploading}
           >
             {status === "submitting" || isUploading ? "Submiting..." : "Save"}
