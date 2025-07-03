@@ -108,9 +108,10 @@ export default function BookingPage() {
   }, [loading]);
 
   return (
-    <main className="max-w-xl mx-auto p-6 mt-6 bg-white shadow-lg rounded-2xl">
+    <main className="w-full max-w-4xl mx-auto p-6 mt-6 bg-white shadow-lg rounded-2xl">
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
       <AvailabilityForm error={error} status={status} setStatus={setStatus} />
+      <hr className="my-6 border-gray-200" />
       {!loading && shouldFetchAvailability && (
         <>
           {availability ? (

@@ -25,7 +25,7 @@ export function AccommodationCard({ accommodation, queryParams }: Props) {
   return (
     <Link
       href={href}
-      className="block bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow mt-6"
+      className="block bg-white  border border-gray-200 shadow-sm hover:shadow-md transition rounded-xl p-4 mt-6"
       aria-label={`View details for ${accommodation.name}`}
     >
       <img

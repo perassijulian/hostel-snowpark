@@ -18,7 +18,7 @@ export default function Button({
       disabled={disabled}
       type={type}
       onClick={onClick}
-      className={`px-6 py-2 text-sm font-semibold rounded-xl transition duration-300 
+      className={`px-6 py-2 text-sm font-semibold rounded-xl shadow-xl transition duration-300 
   ${
     disabled
       ? "bg-gray-400 cursor-not-allowed shadow-none text-white"

@@ -171,7 +171,7 @@ export default function AvailabilityForm({
       {error && <p>{`Failed to fetch availability. Error ${error}`}</p>}
 
       <Button
-        className="mt-4"
+        className="my-2 px-6 py-3"
         type="submit"
         disabled={effectiveStatus === "submitting"}
       >
