@@ -6,6 +6,7 @@ import { useAvailability } from "@/hooks/useAvailability";
 import AccommodationAvailable from "@/components/AccommodationAvailable";
 import { useEffect, useRef, useState } from "react";
 import { Accommodation } from "@/types/accommodation";
+import NoAvailabilityMessage from "@/components/NoAvailabilityMessage";
 
 export default function BookingPage() {
   const router = useRouter();
@@ -112,29 +113,20 @@ export default function BookingPage() {
       <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
       <AvailabilityForm error={error} status={status} setStatus={setStatus} />
       <hr className="my-6 border-gray-200" />
-      {!loading && shouldFetchAvailability && (
-        <>
-          {availability ? (
-            <AccommodationAvailable
-              queryParams={queryParams}
-              available={accommodation}
-            />
-          ) : (
-            <div className="mt-6 p-4 rounded-2xl bg-yellow-50 border border-yellow-200 flex items-start gap-3">
-              <div className="text-sm text-yellow-800">
-                <p className="font-medium mb-1">No availability</p>
-                <p>
-                  Sorry, we don't have any{" "}
-                  <span className="font-semibold">{type}</span> available from{" "}
-                  <span className="font-semibold">{checkIn}</span> to{" "}
-                  <span className="font-semibold">{checkOut}</span>. Try
-                  adjusting your dates or accommodation type.
-                </p>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+      {!loading && shouldFetchAvailability ? (
+        availability ? (
+          <AccommodationAvailable
+            queryParams={queryParams}
+            available={accommodation}
+          />
+        ) : (
+          <NoAvailabilityMessage
+            type={type || ""}
+            checkIn={checkIn || ""}
+            checkOut={checkOut || ""}
+          />
+        )
+      ) : null}
 
       {message && (
         <>
