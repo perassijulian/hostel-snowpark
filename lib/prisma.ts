@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
+// Ensures a single instance of PrismaClient in development (due to hot-reloading)
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 export const prisma =
@@ -8,4 +9,5 @@ export const prisma =
     log: ["error"], // add 'query'|'info' in dev if you like
   });
 
+// Prevent multiple instances in dev
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
