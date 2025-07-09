@@ -7,6 +7,15 @@ import AccommodationAvailable from "@/components/AccommodationAvailable";
 import { useEffect, useRef, useState } from "react";
 import { Accommodation } from "@/types/accommodation";
 import NoAvailabilityMessage from "@/components/NoAvailabilityMessage";
+import { z } from "zod";
+
+const paramsSchema = z.object({
+  checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  guests: z.string().pipe(z.coerce.number().int().positive()),
+  type: z.string(),
+  id: z.string().optional(),
+});
 
 export default function BookingPage() {
   const router = useRouter();
@@ -21,17 +30,30 @@ export default function BookingPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [skipDefaultFetch, setSkipDefaultFetch] = useState(false);
 
-  const id = searchParams.get("id");
-  const type = searchParams.get("type");
-  const checkIn = searchParams.get("checkIn");
-  const checkOut = searchParams.get("checkOut");
-  const guests = searchParams.get("guests");
+  const rawParams = Object.fromEntries(searchParams.entries());
+  const parsedParams = paramsSchema.safeParse(rawParams);
+  if (!parsedParams.success) {
+    console.error(
+      "Invalid query params: ",
+      parsedParams.error.flatten().fieldErrors
+    );
+    return (
+      <main className="max-w-xl mx-auto p-6 mt-6">
+        <p className="text-red-600 font-medium">
+          Invalid or missing query parameters. Please check your search and try
+          again.
+        </p>
+      </main>
+    );
+  }
+
+  const { id, type, checkIn, checkOut, guests } = parsedParams.data;
 
   // For AccommodationAvailable component
   const queryParams = {
     checkIn: checkIn || undefined,
     checkOut: checkOut || undefined,
-    guests: guests || undefined,
+    guests: guests.toString() || undefined,
   };
 
   // Only fetch availability if all are defined
@@ -42,10 +64,10 @@ export default function BookingPage() {
   const { accommodation, availability, loading, error } = useAvailability(
     shouldFetchAvailability
       ? {
-          checkIn: checkIn as string,
-          checkOut: checkOut as string,
-          guests: guests as string,
-          type: type as string,
+          checkIn: checkIn,
+          checkOut: checkOut,
+          guests: guests.toString(),
+          type,
         }
       : null
   );
@@ -60,7 +82,7 @@ export default function BookingPage() {
 
         if (checkIn) params.set("checkIn", checkIn);
         if (checkOut) params.set("checkOut", checkOut);
-        if (guests) params.set("guests", guests);
+        if (guests) params.set("guests", guests.toString());
         if (type) params.set("type", type);
         if (id) params.set("id", id.toString());
 
