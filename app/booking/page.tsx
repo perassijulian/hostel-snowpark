@@ -7,15 +7,7 @@ import AccommodationAvailable from "@/components/AccommodationAvailable";
 import { useEffect, useRef, useState } from "react";
 import { Accommodation } from "@/types/accommodation";
 import NoAvailabilityMessage from "@/components/NoAvailabilityMessage";
-import { z } from "zod";
-
-const paramsSchema = z.object({
-  checkIn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  checkOut: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  guests: z.string().pipe(z.coerce.number().int().positive()),
-  type: z.string(),
-  id: z.string().optional(),
-});
+import { parseBookingParams } from "@/lib/parseBookingParams";
 
 export default function BookingPage() {
   const router = useRouter();
@@ -30,13 +22,9 @@ export default function BookingPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [skipDefaultFetch, setSkipDefaultFetch] = useState(false);
 
-  const rawParams = Object.fromEntries(searchParams.entries());
-  const parsedParams = paramsSchema.safeParse(rawParams);
-  if (!parsedParams.success) {
-    console.error(
-      "Invalid query params: ",
-      parsedParams.error.flatten().fieldErrors
-    );
+  const { hasParams, data } = parseBookingParams(searchParams);
+
+  if (hasParams && !data) {
     return (
       <main className="max-w-xl mx-auto p-6 mt-6">
         <p className="text-red-600 font-medium">
@@ -47,13 +35,22 @@ export default function BookingPage() {
     );
   }
 
-  const { id, type, checkIn, checkOut, guests } = parsedParams.data;
+  if (!data) {
+    return (
+      <main className="w-full max-w-4xl mx-auto p-6 mt-6 bg-white shadow-lg rounded-2xl">
+        <h1 className="text-3xl font-bold mb-6">Book Your Stay</h1>
+        <AvailabilityForm error={""} status={status} setStatus={setStatus} />
+      </main>
+    );
+  }
+
+  const { id, type, checkIn, checkOut, guests } = data;
 
   // For AccommodationAvailable component
   const queryParams = {
     checkIn: checkIn || undefined,
     checkOut: checkOut || undefined,
-    guests: guests.toString() || undefined,
+    guests: guests?.toString() || undefined,
   };
 
   // Only fetch availability if all are defined
@@ -62,12 +59,12 @@ export default function BookingPage() {
   );
 
   const { accommodation, availability, loading, error } = useAvailability(
-    shouldFetchAvailability
+    shouldFetchAvailability && checkIn && checkOut && guests && type
       ? {
-          checkIn: checkIn,
-          checkOut: checkOut,
+          checkIn: checkIn as string,
+          checkOut: checkOut as string,
           guests: guests.toString(),
-          type,
+          type: type as string,
         }
       : null
   );
