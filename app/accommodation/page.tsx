@@ -10,16 +10,19 @@ export default function AccommodationsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/accommodation")
-      .then((res) => res.json())
-      .then((data) => {
-        setAccommodations(data);
+    const fetchAccommodations = async () => {
+      try {
+        const res = await fetch("/api/accommodation");
+        const data = await res.json();
+
+        setAccommodations(data.accommodations);
+      } catch (error) {
+        console.error(error);
+      } finally {
         setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching accommodations:", err);
-        setIsLoading(false);
-      });
+      }
+    };
+    fetchAccommodations();
   }, []);
 
   if (isLoading) {

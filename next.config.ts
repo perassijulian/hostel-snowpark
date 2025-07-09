@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ["utfs.io"],
+    domains: ["utfs.io", "vcxi741wge.ufs.sh"],
   },
 };
 
