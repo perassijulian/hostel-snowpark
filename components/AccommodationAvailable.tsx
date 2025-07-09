@@ -2,7 +2,7 @@ import { Accommodation } from "@/types/accommodation";
 import { AccommodationCard } from "./AccommodationCard";
 
 type Props = {
-  available: Accommodation[] | [];
+  available: Accommodation[];
   queryParams?: {
     checkIn?: string;
     checkOut?: string;
@@ -14,10 +14,11 @@ export default function AccommodationAvailable({
   available,
   queryParams,
 }: Props) {
-  if (!available || available.length === 0) return null;
+  if (!available || available.length === 0)
+    return <p className="text-gray-500 mt-4">No accommodations available.</p>;
 
   return (
-    <div className="gap-6">
+    <div className="flex flex-col gap-6">
       {available.map((a) => (
         <AccommodationCard
           key={a.id}
